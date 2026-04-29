@@ -1582,19 +1582,19 @@
         async function viewAdmission(root) {
             const r = await fetch(API_U); const us = await r.json(); const ds = us.filter(u => u.role === 'doctor' && u.status === 'approved');
             root.innerHTML = `
-                <div class="view-header"><h2>Admission Manuelle</h2><p>Enregistrer un patient sans rendez-vous préalable.</p></div>
+                <div class="view-header"><h2>${t('adm_title')}</h2><p>${t('adm_subtitle')}</p></div>
                 <div class="card" style="max-width: 500px; margin: 0 auto;">
                     <form onsubmit="savePatient(event)">
-                        <div class="form-group"><label>Prénom</label><input type="text" id="p-f" required></div>
-                        <div class="form-group"><label>Nom</label><input type="text" id="p-l" required></div>
-                        <div class="form-group"><label>Date de Naissance</label><input type="date" id="p-d" required></div>
-                        <div class="form-group"><label>Médecin Spécialiste</label>
+                        <div class="form-group"><label>${t('adm_fname')}</label><input type="text" id="p-f" required></div>
+                        <div class="form-group"><label>${t('adm_lname')}</label><input type="text" id="p-l" required></div>
+                        <div class="form-group"><label>${t('adm_dob')}</label><input type="date" id="p-d" required></div>
+                        <div class="form-group"><label>${t('adm_doctor')}</label>
                             <select id="p-doc" required>
                                 ${ds.map(d => `<option value="${d.id}">Dr. ${d.first_name} ${d.last_name}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="form-group"><label>Groupe Sanguin</label><input type="text" id="p-blood" placeholder="ex: O+"></div>
-                        <button type="submit" class="btn btn-primary w-full">ENREGISTRER LE DOSSIER</button>
+                        <div class="form-group"><label>${t('adm_blood')}</label><input type="text" id="p-blood" placeholder="${t('adm_blood_ph')}"></div>
+                        <button type="submit" class="btn btn-primary w-full">${t('adm_save')}</button>
                     </form>
                 </div>
             `;
@@ -1619,30 +1619,30 @@
         function viewDoctorRDV(root) {
             const rdvs = JSON.parse(localStorage.getItem('renal_rdvs') || '[]').filter(r => r.docId === user.id && r.status === 'approved');
             root.innerHTML = `
-                <div class="view-header"><h2>Agenda du Jour</h2><p>Gérez vos consultations. Note obligatoire pour valider.</p></div>
+                <div class="view-header"><h2>${t('rdv_title')}</h2><p>${t('rdv_subtitle')}</p></div>
                 <div class="grid" style="grid-template-columns: 1fr;">
-                    ${rdvs.length === 0 ? '<p>Aucun patient prévu.</p>' : rdvs.map(r => `
+                    ${rdvs.length === 0 ? `<p>${t('rdv_no_patient')}</p>` : rdvs.map(r => `
                         <div class="card mb-4" style="border-left:5px solid var(--primary);">
                             <div class="flex justify-between items-center mb-4">
                                 <div><span class="rdv-time">${r.time}</span> - <span class="rdv-patient">${r.patient}</span></div>
                                 <div class="flex gap-2">
-                                    <button onclick="finishConsultation(${r.id})" class="btn btn-primary btn-sm">Valider Consultation</button>
-                                    <button onclick="markAbsent(${r.id})" class="btn btn-secondary btn-sm" style="color:var(--danger)">Absent (MJCH)</button>
+                                    <button onclick="finishConsultation(${r.id})" class="btn btn-primary btn-sm">${t('rdv_validate')}</button>
+                                    <button onclick="markAbsent(${r.id})" class="btn btn-secondary btn-sm" style="color:var(--danger)">${t('rdv_absent')}</button>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label>Remarques Médicales (Obligatoire pour valider)</label>
-                                <textarea id="rem-doc-${r.id}" rows="3" placeholder="Saisissez vos observations..."></textarea>
+                                <label>${t('rdv_notes')}</label>
+                                <textarea id="rem-doc-${r.id}" rows="3" placeholder="${t('rdv_notes_ph')}"></textarea>
                             </div>
                         </div>
                     `).join('')}
                 </div>
                 <div class="card mt-4">
-                    <h3>Gérer mes Congés</h3>
+                    <h3>${t('rdv_vacations')}</h3>
                     <div class="flex gap-4">
-                        <div class="form-group"><label>Début</label><input type="date" id="vac-start"></div>
-                        <div class="form-group"><label>Fin</label><input type="date" id="vac-end"></div>
-                        <button onclick="setVacation()" class="btn btn-secondary" style="height:fit-content; align-self:center;">Déclarer Congés</button>
+                        <div class="form-group"><label>${t('rdv_vac_start')}</label><input type="date" id="vac-start"></div>
+                        <div class="form-group"><label>${t('rdv_vac_end')}</label><input type="date" id="vac-end"></div>
+                        <button onclick="setVacation()" class="btn btn-secondary" style="height:fit-content; align-self:center;">${t('rdv_declare_vac')}</button>
                     </div>
                 </div>
             `;
@@ -1691,13 +1691,13 @@
 
             root.innerHTML = `
                 <div class="view-header">
-                    <h2>Bienvenue, ${user.first_name} ${user.last_name}</h2>
-                    <p style="color:var(--text-secondary);">Voici l'état de votre service aujourd'hui.</p>
+                    <h2>${t('dash_welcome')}, ${user.first_name} ${user.last_name}</h2>
+                    <p style="color:var(--text-secondary);">${t('dash_service_today')}</p>
                 </div>
                 <div class="grid">
-                    <div class="card"><span class="stat-label">Analyses Totales</span><span class="stat-val">128</span></div>
-                    <div class="card"><span class="stat-label">Patients Actifs</span><span class="stat-val">${patients.length}</span></div>
-                    <div class="card"><span class="stat-label">Précision IA</span><span class="stat-val">99.2%</span></div>
+                    <div class="card"><span class="stat-label">${t('dash_total_analyses')}</span><span class="stat-val">128</span></div>
+                    <div class="card"><span class="stat-label">${t('dash_active_patients')}</span><span class="stat-val">${patients.length}</span></div>
+                    <div class="card"><span class="stat-label">${t('dash_ai_accuracy')}</span><span class="stat-val">99.2%</span></div>
                 </div>
                 <div style="margin-top:2rem;">
                     <canvas id="performanceChart" style="max-height:300px;"></canvas>
@@ -1734,43 +1734,43 @@
         // --- PROFILE PRO ---
         function viewProfile(root) {
             root.innerHTML = `
-                <div class="view-header"><h2>Votre Profil Professionnel</h2><p>Gérez vos informations et préférences.</p></div>
+                <div class="view-header"><h2>${t('prof_title')}</h2><p>${t('prof_subtitle')}</p></div>
                 <div class="grid" style="grid-template-columns: 1fr 2fr;">
                     <div class="card text-center">
                         <div class="profile-img-container">
                             <img id="profile-photo-display" src="${user.photo || 'https://via.placeholder.com/150'}" class="doctor-photo-preview" style="width:150px; height:150px;">
                             <input type="file" onchange="updateProfilePhoto(this)">
-                            <div style="font-weight:800; color:var(--primary); margin-top:10px;">CHANGER LA PHOTO</div>
+                            <div style="font-weight:800; color:var(--primary); margin-top:10px;">${t('prof_change_photo')}</div>
                         </div>
                         <h2 class="mt-4">${user.first_name} ${user.last_name.toUpperCase()}</h2>
                         <div class="badge badge-approved">${user.role.toUpperCase()}</div>
-                        <p style="color:var(--text-secondary); margin-top:1rem;">Spécialité: ${user.specialty || 'Médecine Générale'}</p>
+                        <p style="color:var(--text-secondary); margin-top:1rem;">${t('prof_specialty')}: ${user.specialty || 'Médecine Générale'}</p>
                         
                         ${user.role === 'doctor' ? `
                             <div style="margin-top:2rem; border-top:1px solid #eee; pt-4">
                                 <button onclick="viewImpersonateNurse(document.getElementById('main-content'))" class="btn btn-secondary w-full" style="border-color:var(--primary); color:var(--primary);">
-                                    <i class="fa-solid fa-user-nurse"></i> Accès Compte Assistant
+                                    <i class="fa-solid fa-user-nurse"></i> ${t('prof_access_nurse')}
                                 </button>
                             </div>
                         ` : ''}
                     </div>
                     <div class="card">
-                        <h3 class="mb-4">Informations du Compte</h3>
-                        <div class="form-group"><label>Nom Complet</label><input type="text" id="prof-name" value="${user.first_name} ${user.last_name}" readonly style="background:#f9f9f9"></div>
-                        <div class="form-group"><label>Email Professionnel</label><input type="email" id="prof-email" value="${user.email}" readonly style="background:#f9f9f9"></div>
+                        <h3 class="mb-4">${t('prof_info')}</h3>
+                        <div class="form-group"><label>${t('prof_fullname')}</label><input type="text" id="prof-name" value="${user.first_name} ${user.last_name}" readonly style="background:#f9f9f9"></div>
+                        <div class="form-group"><label>${t('prof_email')}</label><input type="email" id="prof-email" value="${user.email}" readonly style="background:#f9f9f9"></div>
                         
                         <div class="grid grid-cols-2 gap-4">
-                            <div class="form-group"><label>Téléphone</label><input type="text" id="prof-phone" value="${user.phone || ''}" placeholder="05XX XX XX XX"></div>
-                            <div class="form-group"><label>Nom de la Clinique / Cabinet</label><input type="text" id="prof-clinic" value="${user.clinic_name || ''}" placeholder="Ex: Clinique El Hana"></div>
+                            <div class="form-group"><label>${t('prof_phone')}</label><input type="text" id="prof-phone" value="${user.phone || ''}" placeholder="${t('prof_phone_ph')}"></div>
+                            <div class="form-group"><label>${t('prof_clinic')}</label><input type="text" id="prof-clinic" value="${user.clinic_name || ''}" placeholder="${t('prof_clinic_ph')}"></div>
                         </div>
                         
-                        <div class="form-group"><label>Localisation / Adresse</label><input type="text" id="prof-loc" value="${user.location || ''}" placeholder="Ex: Alger Centre, Rue Didouche Mourad"></div>
+                        <div class="form-group"><label>${t('prof_location')}</label><input type="text" id="prof-loc" value="${user.location || ''}" placeholder="${t('prof_location_ph')}"></div>
                         
-                        <div class="form-group"><label>Identifiant Hospitalier</label><input type="text" value="HOSP-2024-${user.id}" readonly style="background:#f9f9f9"></div>
+                        <div class="form-group"><label>${t('prof_hospital_id')}</label><input type="text" value="HOSP-2024-${user.id}" readonly style="background:#f9f9f9"></div>
                         
                         <div class="flex gap-2 mt-4">
-                            <button class="btn btn-primary w-full" onclick="saveProfile()">Enregistrer les modifications</button>
-                            <button class="btn btn-secondary w-full" style="color:var(--danger); border-color:var(--danger)" onclick="requestQuit()">Quitter le service (Supprimer le compte)</button>
+                            <button class="btn btn-primary w-full" onclick="saveProfile()">${t('prof_save')}</button>
+                            <button class="btn btn-secondary w-full" style="color:var(--danger); border-color:var(--danger)" onclick="requestQuit()">${t('prof_quit')}</button>
                         </div>
                     </div>
                 </div>
@@ -1843,52 +1843,52 @@
             const pend = us.filter(u => u.status === 'pending');
 
             root.innerHTML = `
-                <div class="view-header"><h2>Approbations</h2><p>Gérez les nouveaux comptes et les oublis de mot de passe.</p></div>
+                <div class="view-header"><h2>${t('app_title')}</h2><p>${t('app_subtitle')}</p></div>
                 
-                <h3 class="mb-4">Demandes d'inscription (${pend.length})</h3>
+                <h3 class="mb-4">${t('app_signup_requests')} (${pend.length})</h3>
                 <div class="table-container mb-4">
                     <table>
-                        <thead><tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Actions</th></tr></thead>
+                        <thead><tr><th>${t('app_name')}</th><th>${t('app_email_col')}</th><th>${t('app_role')}</th><th>${t('app_actions_col')}</th></tr></thead>
                         <tbody>
-                            ${pend.length === 0 ? '<tr><td colspan="4" class="text-center">Aucune demande.</td></tr>' : pend.map(u => `
+                            ${pend.length === 0 ? `<tr><td colspan="4" class="text-center">${t('app_no_request')}</td></tr>` : pend.map(u => `
                                 <tr>
                                     <td><strong>${u.first_name} ${u.last_name}</strong></td>
                                     <td>${u.email}</td>
                                     <td>${u.role}</td>
-                                    <td><div class="flex gap-2"><button onclick="adminOp(${u.id}, 'approve')" class="btn btn-sm btn-primary">Accepter</button><button onclick="adminOp(${u.id}, 'reject')" class="btn btn-sm btn-secondary">Refuser</button></div></td>
+                                    <td><div class="flex gap-2"><button onclick="adminOp(${u.id}, 'approve')" class="btn btn-sm btn-primary">${t('app_accept')}</button><button onclick="adminOp(${u.id}, 'reject')" class="btn btn-sm btn-secondary">${t('app_refuse')}</button></div></td>
                                 </tr>
                             `).join('')}
                         </tbody>
                     </table>
                 </div>
 
-                <h3 class="mb-4">Demandes de Mot de passe oublié (${resets.length})</h3>
+                <h3 class="mb-4">${t('app_reset_requests')} (${resets.length})</h3>
                 <div class="table-container mb-4">
                     <table>
-                        <thead><tr><th>Nom</th><th>Email</th><th>Action</th></tr></thead>
+                        <thead><tr><th>${t('app_name')}</th><th>${t('app_email_col')}</th><th>${t('app_actions_col')}</th></tr></thead>
                         <tbody>
-                            ${resets.length === 0 ? '<tr><td colspan="3" class="text-center">Aucune demande.</td></tr>' : resets.map(r => `
+                            ${resets.length === 0 ? `<tr><td colspan="3" class="text-center">${t('app_no_request')}</td></tr>` : resets.map(r => `
                                 <tr>
                                     <td><strong>${r.full_name}</strong></td>
                                     <td>${r.email}</td>
-                                    <td><button onclick="adminOp(${r.id}, 'approve_reset')" class="btn btn-sm btn-primary">Valider Nouveau MDP</button></td>
+                                    <td><button onclick="adminOp(${r.id}, 'approve_reset')" class="btn btn-sm btn-primary">${t('app_validate_pwd')}</button></td>
                                 </tr>
                             `).join('')}
                         </tbody>
                     </table>
                 </div>
 
-                <h3 class="mb-4">Demandes de Départ (${us.filter(u => u.quit_requested).length})</h3>
+                <h3 class="mb-4">${t('app_quit_requests')} (${us.filter(u => u.quit_requested).length})</h3>
                 <div class="table-container">
                     <table>
-                        <thead><tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Action</th></tr></thead>
+                        <thead><tr><th>${t('app_name')}</th><th>${t('app_email_col')}</th><th>${t('app_role')}</th><th>${t('app_actions_col')}</th></tr></thead>
                         <tbody>
-                            ${us.filter(u => u.quit_requested).length === 0 ? '<tr><td colspan="4" class="text-center">Aucune demande.</td></tr>' : us.filter(u => u.quit_requested).map(u => `
+                            ${us.filter(u => u.quit_requested).length === 0 ? `<tr><td colspan="4" class="text-center">${t('app_no_request')}</td></tr>` : us.filter(u => u.quit_requested).map(u => `
                                 <tr>
                                     <td><strong>${u.first_name} ${u.last_name}</strong></td>
                                     <td>${u.email}</td>
                                     <td>${u.role}</td>
-                                    <td><button onclick="adminOp(${u.id}, 'delete_user')" class="btn btn-sm btn-secondary" style="color:var(--danger)">Supprimer Compte</button></td>
+                                    <td><button onclick="adminOp(${u.id}, 'delete_user')" class="btn btn-sm btn-secondary" style="color:var(--danger)">${t('app_delete_account')}</button></td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -1933,10 +1933,10 @@
         async function viewStaff(root) {
             const r = await fetch(API_U); const us = await r.json();
             root.innerHTML = `
-                <div class="view-header"><h2>Gestion Staff</h2><p>Liste complète du personnel autorisé.</p></div>
-                <div class="search-bar"><i class="fa-solid fa-search"></i><input type="text" placeholder="Filtrer..." oninput="filter(this.value, 'staff-tbl')"></div>
-                <div class="table-container"><table id="staff-tbl"><thead><tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Status</th><th>Action</th></tr></thead><tbody>
-                ${us.map(u => `<tr><td><strong>${u.first_name} ${u.last_name}</strong></td><td>${u.email}</td><td>${u.role}</td><td><span class="badge badge-${u.status}">${u.status}</span></td><td>${u.role !== 'admin' ? `<button onclick="adminOp(${u.id}, 'delete_user')" class="btn btn-sm btn-secondary" style="color:var(--danger); width:auto">Supprimer</button>` : ''}</td></tr>`).join('')}
+                <div class="view-header"><h2>${t('staff_title')}</h2><p>${t('staff_subtitle')}</p></div>
+                <div class="search-bar"><i class="fa-solid fa-search"></i><input type="text" placeholder="${t('staff_filter')}" oninput="filter(this.value, 'staff-tbl')"></div>
+                <div class="table-container"><table id="staff-tbl"><thead><tr><th>${t('staff_name')}</th><th>${t('staff_email_col')}</th><th>${t('staff_role')}</th><th>${t('staff_status')}</th><th>${t('staff_action')}</th></tr></thead><tbody>
+                ${us.map(u => `<tr><td><strong>${u.first_name} ${u.last_name}</strong></td><td>${u.email}</td><td>${u.role}</td><td><span class="badge badge-${u.status}">${u.status}</span></td><td>${u.role !== 'admin' ? `<button onclick="adminOp(${u.id}, 'delete_user')" class="btn btn-sm btn-secondary" style="color:var(--danger); width:auto">${t('staff_delete')}</button>` : ''}</td></tr>`).join('')}
                 </tbody></table></div>
             `;
         }
@@ -1952,16 +1952,16 @@
 
             const leaveHTML = pendingLeaves.length > 0 ? `
                 <div class="card mb-4" style="border-left: 5px solid #f59e0b; background:#fffbeb;">
-                    <h3 style="color:#d97706;"><i class="fa-solid fa-umbrella-beach"></i> Demandes de Congé (${pendingLeaves.length})</h3>
+                    <h3 style="color:#d97706;"><i class="fa-solid fa-umbrella-beach"></i> ${t('mp_leave_requests')} (${pendingLeaves.length})</h3>
                     ${pendingLeaves.map(l => `
                         <div class="flex justify-between items-center" style="padding:0.75rem 0; border-bottom:1px solid #fde68a;">
                             <div>
                                 <strong>${l.assistant_name}</strong><br>
-                                <span style="font-size:0.85rem; color:#92400e;">Du <strong>${l.start_date}</strong> au <strong>${l.end_date}</strong></span>
+                                <span style="font-size:0.85rem; color:#92400e;">${t('mp_from')} <strong>${l.start_date}</strong> ${t('mp_to')} <strong>${l.end_date}</strong></span>
                             </div>
                             <div class="flex gap-2">
-                                <button onclick="approveLeaveRequest(${l.assistant_id})" class="btn btn-sm btn-primary">Valider</button>
-                                <button onclick="rejectLeaveRequest(${l.assistant_id})" class="btn btn-sm btn-secondary" style="color:var(--danger);">Refuser</button>
+                                <button onclick="approveLeaveRequest(${l.assistant_id})" class="btn btn-sm btn-primary">${t('mp_validate')}</button>
+                                <button onclick="rejectLeaveRequest(${l.assistant_id})" class="btn btn-sm btn-secondary" style="color:var(--danger);">${t('mp_refuse')}</button>
                             </div>
                         </div>
                     `).join('')}
@@ -1972,24 +1972,24 @@
             const assistantHTML = assistant ? `
                 <div class="card mb-4" style="border-left: 5px solid var(--primary); display: flex; justify-content: space-between; align-items: center; background: #f0fdf4;">
                     <div>
-                        <h3 style="margin:0; color:var(--primary);"><i class="fa-solid fa-user-nurse"></i> Mon Assistant(e) : ${assistant.first_name} ${assistant.last_name}</h3>
+                        <h3 style="margin:0; color:var(--primary);"><i class="fa-solid fa-user-nurse"></i> ${t('mp_assistant')} : ${assistant.first_name} ${assistant.last_name}</h3>
                         ${assistant.quit_requested ? `<p style="margin:5px 0 0 0; color:var(--danger); font-weight:bold; font-size:0.9rem;"><i class="fa-solid fa-triangle-exclamation"></i> Souhaite quitter le service définitivement.</p>` : ''}
                     </div>
                     <button onclick="openAssignNurseModal(${assistant.id})" class="btn btn-secondary" style="border-color:var(--primary); color:var(--primary); width:auto;">
-                        <i class="fa-solid fa-people-arrows"></i> Remplacer
+                        <i class="fa-solid fa-people-arrows"></i> ${t('mp_replace')}
                     </button>
                 </div>
             ` : `
                 <div class="card mb-4" style="border-left: 5px solid #cbd5e1; background: #f8fafc; display: flex; justify-content: space-between; align-items: center;">
-                    <p style="margin:0; color:var(--text-secondary);"><i class="fa-solid fa-user-slash"></i> Aucune assistante assignée.</p>
+                    <p style="margin:0; color:var(--text-secondary);"><i class="fa-solid fa-user-slash"></i> ${t('mp_no_assistant')}</p>
                     <button onclick="openAssignNurseModal(null)" class="btn btn-primary" style="width:auto;">
-                        <i class="fa-solid fa-plus"></i> Assigner une assistante
+                        <i class="fa-solid fa-plus"></i> ${t('mp_assign_nurse')}
                     </button>
                 </div>
             `;
 
             root.innerHTML = `
-                <div class="view-header"><h2>Mes Patients</h2><p>Dossiers sous votre responsabilité.</p></div>
+                <div class="view-header"><h2>${t('mp_title')}</h2><p>${t('mp_subtitle')}</p></div>
                 
                 <div class="grid" style="grid-template-columns: 1fr 2fr; gap: 1.5rem; align-items: start;">
                     <div class="assistant-sidebar">
@@ -1997,9 +1997,9 @@
                         ${leaveHTML}
                     </div>
                     <div class="patients-main">
-                        <div class="search-bar" style="max-width:100%"><i class="fa-solid fa-search"></i><input type="text" placeholder="Rechercher un patient..." oninput="filter(this.value, 'my-patients-tbl')"></div>
-                        <div class="table-container"><table id="my-patients-tbl"><thead><tr><th>Patient</th><th>Né(e) le</th><th>Action</th></tr></thead><tbody>
-                        ${ps.length === 0 ? '<tr><td colspan="3" class="text-center">Aucun patient assigné.</td></tr>' : ps.map(p => `<tr><td><strong>${p.first_name} ${p.last_name}</strong></td><td>${p.date_of_birth}</td><td><button onclick="openPatient(${p.id})" class="btn btn-sm btn-primary" style="width:auto">Ouvrir Dossier</button></td></tr>`).join('')}
+                        <div class="search-bar" style="max-width:100%"><i class="fa-solid fa-search"></i><input type="text" placeholder="${t('mp_search')}" oninput="filter(this.value, 'my-patients-tbl')"></div>
+                        <div class="table-container"><table id="my-patients-tbl"><thead><tr><th>${t('mp_patient_col')}</th><th>${t('mp_dob_col')}</th><th>${t('mp_action_col')}</th></tr></thead><tbody>
+                        ${ps.length === 0 ? `<tr><td colspan="3" class="text-center">${t('mp_no_patient')}</td></tr>` : ps.map(p => `<tr><td><strong>${p.first_name} ${p.last_name}</strong></td><td>${p.date_of_birth}</td><td><button onclick="openPatient(${p.id})" class="btn btn-sm btn-primary" style="width:auto">${t('mp_open_file')}</button></td></tr>`).join('')}
                         </tbody></table></div>
                     </div>
                 </div>
@@ -2331,28 +2331,28 @@
             const patients = await r.json();
 
             root.innerHTML = `
-                <div class="view-header"><h2>Analyse Scanner PyTorch</h2><p>Analyse automatique de calculs rénaux.</p></div>
+                <div class="view-header"><h2>${t('scan_title')}</h2><p>${t('scan_subtitle')}</p></div>
                 <div class="scanner-hero">
                     <input type="file" id="scan-file-input" class="hidden" onchange="handleFileSelect(this)">
                     <div class="upload-zone" onclick="document.getElementById('scan-file-input').click()">
                         <i class="fa-solid fa-file-medical fa-3x" style="color:var(--primary)"></i>
-                        <h3 id="upload-status">Cliquez pour télécharger un scan</h3>
-                        <p id="file-name">DICOM, PNG, JPG (Max 50MB)</p>
+                        <h3 id="upload-status">${t('scan_click')}</h3>
+                        <p id="file-name">${t('scan_formats')}</p>
                     </div>
                     <div style="max-width: 500px; margin: 0 auto; text-align: left;">
                         <div class="form-group">
-                            <label>Sélectionner le Patient</label>
+                            <label>${t('scan_select_patient')}</label>
                             <select id="scan-patient-id" required>
-                                <option value="">-- Choisir un patient --</option>
+                                <option value="">${t('scan_choose_patient')}</option>
                                 ${patients.map(p => `<option value="${p.id}">${p.first_name} ${p.last_name}</option>`).join('')}
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Date de Consultation</label>
+                            <label>${t('scan_date')}</label>
                             <input type="date" id="scan-date" value="${new Date().toISOString().split('T')[0]}">
                         </div>
-                        <div class="form-group"><label>Observations Pré-scan</label><textarea id="scan-obs" rows="3"></textarea></div>
-                        <button onclick="runAI()" id="btn-run-ai" class="btn btn-primary"><i class="fa-solid fa-brain"></i> Lancer la Segmentation</button>
+                        <div class="form-group"><label>${t('scan_obs')}</label><textarea id="scan-obs" rows="3"></textarea></div>
+                        <button onclick="runAI()" id="btn-run-ai" class="btn btn-primary"><i class="fa-solid fa-brain"></i> ${t('scan_run')}</button>
                     </div>
                 </div>
                 <div id="ai-result-section" class="hidden card" style="max-width: 600px; margin: 2rem auto; border: 2px solid var(--primary);">
@@ -2504,6 +2504,7 @@
 
         const translations = {
             fr: {
+                // Auth
                 subtitle: "Intelligence Artificielle & Gestion Médicale",
                 email: "Adresse Email",
                 password: "Mot de passe",
@@ -2513,6 +2514,7 @@
                 new_here: "Nouveau ?",
                 create_account: "Créer un compte",
                 logout: "Déconnexion",
+                // Nav
                 dashboard: "Tableau de Bord",
                 my_patients: "Mes Patients",
                 ai_analysis: "Analyse IA",
@@ -2523,9 +2525,174 @@
                 doc_patients: "Patients Dr.",
                 profile: "Mon Profil",
                 approvals: "Vérifications",
-                staff_mgmt: "Gestion Staff"
+                staff_mgmt: "Gestion Staff",
+                // Dashboard
+                dash_welcome: "Bienvenue",
+                dash_service_today: "Voici l'état de votre service aujourd'hui.",
+                dash_total_analyses: "Analyses Totales",
+                dash_active_patients: "Patients Actifs",
+                dash_ai_accuracy: "Précision IA",
+                // My Patients
+                mp_title: "Mes Patients",
+                mp_subtitle: "Dossiers sous votre responsabilité.",
+                mp_search: "Rechercher un patient...",
+                mp_patient_col: "Patient",
+                mp_dob_col: "Né(e) le",
+                mp_action_col: "Action",
+                mp_open_file: "Ouvrir Dossier",
+                mp_no_patient: "Aucun patient assigné.",
+                mp_assistant: "Mon Assistant(e)",
+                mp_no_assistant: "Aucune assistante assignée.",
+                mp_assign_nurse: "Assigner une assistante",
+                mp_replace: "Remplacer",
+                mp_leave_requests: "Demandes de Congé",
+                mp_validate: "Valider",
+                mp_refuse: "Refuser",
+                mp_from: "Du",
+                mp_to: "au",
+                // AI Scan
+                scan_title: "Analyse Scanner PyTorch",
+                scan_subtitle: "Analyse automatique de calculs rénaux.",
+                scan_click: "Cliquez pour télécharger un scan",
+                scan_formats: "DICOM, PNG, JPG (Max 50MB)",
+                scan_select_patient: "Sélectionner le Patient",
+                scan_choose_patient: "-- Choisir un patient --",
+                scan_date: "Date de Consultation",
+                scan_obs: "Observations Pré-scan",
+                scan_run: "Lancer la Segmentation",
+                scan_report: "RAPPORT D'ANALYSE IA",
+                scan_proba: "Probabilités par Classe",
+                scan_notes: "Notes Médicales Finales & Remarques",
+                scan_save: "Enregistrer dans le Dossier Patient",
+                scan_detected: "Détecté",
+                scan_severity: "Sévérité",
+                scan_coverage: "Couverture",
+                scan_normal: "Normal",
+                scan_processing: "Traitement...",
+                // Doctor Agenda
+                rdv_title: "Agenda du Jour",
+                rdv_subtitle: "Gérez vos consultations. Note obligatoire pour valider.",
+                rdv_validate: "Valider Consultation",
+                rdv_absent: "Absent (MJCH)",
+                rdv_notes: "Remarques Médicales (Obligatoire pour valider)",
+                rdv_notes_ph: "Saisissez vos observations...",
+                rdv_no_patient: "Aucun patient prévu.",
+                rdv_vacations: "Gérer mes Congés",
+                rdv_vac_start: "Début",
+                rdv_vac_end: "Fin",
+                rdv_declare_vac: "Déclarer Congés",
+                // Admissions
+                adm_title: "Admission Manuelle",
+                adm_subtitle: "Enregistrer un patient sans rendez-vous préalable.",
+                adm_fname: "Prénom",
+                adm_lname: "Nom",
+                adm_dob: "Date de Naissance",
+                adm_doctor: "Médecin Spécialiste",
+                adm_blood: "Groupe Sanguin",
+                adm_blood_ph: "ex: O+",
+                adm_save: "ENREGISTRER LE DOSSIER",
+                // Validate RDV (assistant)
+                ardv_title: "Validation des Rendez-vous",
+                ardv_subtitle: "Gérez les demandes de votre médecin attitré.",
+                ardv_no_doctor: "Vous n'avez aucun médecin attitré pour le moment.",
+                ardv_contact_admin: "Contactez l'administrateur pour être assigné(e) à un médecin.",
+                ardv_no_rdv: "Aucune demande de rendez-vous en attente pour votre service.",
+                ardv_new: "NOUVEAU",
+                ardv_existing: "ANCIEN",
+                ardv_date: "Date",
+                ardv_dob: "DOB",
+                // Global Planning
+                gp_title: "Planning Global (2 Mois)",
+                gp_subtitle: "Vue d'ensemble centralisée.",
+                gp_filter: "Filtrer...",
+                gp_date_time: "Date & Heure",
+                gp_doctor: "Médecin",
+                gp_patient: "Patient",
+                gp_status: "Statut",
+                gp_actions: "Actions",
+                gp_no_rdv: "Aucun RDV.",
+                gp_manual_rdv: "Prendre RDV Manuel (Assistant)",
+                // Doctor Patients (nurse view)
+                dp_title: "Patients du Médecin",
+                dp_subtitle: "Vous consultez uniquement les patients de votre médecin référent.",
+                dp_search: "Rechercher...",
+                dp_patient_col: "Patient",
+                dp_dob_col: "Né(e) le",
+                dp_last_visit: "Dernière Visite",
+                dp_action: "Action",
+                dp_view_file: "Voir Dossier",
+                dp_no_patient: "Aucun patient pour ce médecin.",
+                dp_no_doctor: "Vous n'êtes assigné(e) à aucun médecin pour le moment.",
+                dp_request_leave: "Demander un Congé",
+                dp_quit_title: "Quitter le Service (Définitif)",
+                dp_quit_text: "Cette action est irréversible. L'historique des patients sera conservé et transmis au remplaçant(e).",
+                dp_quit_btn: "Demander à quitter définitivement",
+                dp_leave_pending: "Congé en attente :",
+                dp_leave_awaiting: "En attente de validation",
+                // Profile
+                prof_title: "Votre Profil Professionnel",
+                prof_subtitle: "Gérez vos informations et préférences.",
+                prof_info: "Informations du Compte",
+                prof_fullname: "Nom Complet",
+                prof_email: "Email Professionnel",
+                prof_phone: "Téléphone",
+                prof_phone_ph: "05XX XX XX XX",
+                prof_clinic: "Nom de la Clinique / Cabinet",
+                prof_clinic_ph: "Ex: Clinique El Hana",
+                prof_location: "Localisation / Adresse",
+                prof_location_ph: "Ex: Alger Centre, Rue Didouche Mourad",
+                prof_hospital_id: "Identifiant Hospitalier",
+                prof_save: "Enregistrer les modifications",
+                prof_quit: "Quitter le service (Supprimer le compte)",
+                prof_specialty: "Spécialité",
+                prof_change_photo: "CHANGER LA PHOTO",
+                prof_access_nurse: "Accès Compte Assistant",
+                // Approvals
+                app_title: "Approbations",
+                app_subtitle: "Gérez les nouveaux comptes et les oublis de mot de passe.",
+                app_signup_requests: "Demandes d'inscription",
+                app_name: "Nom",
+                app_email_col: "Email",
+                app_role: "Rôle",
+                app_actions_col: "Actions",
+                app_accept: "Accepter",
+                app_refuse: "Refuser",
+                app_no_request: "Aucune demande.",
+                app_reset_requests: "Demandes de Mot de passe oublié",
+                app_validate_pwd: "Valider Nouveau MDP",
+                app_quit_requests: "Demandes de Départ",
+                app_delete_account: "Supprimer Compte",
+                // Staff
+                staff_title: "Gestion Staff",
+                staff_subtitle: "Liste complète du personnel autorisé.",
+                staff_filter: "Filtrer...",
+                staff_name: "Nom",
+                staff_email_col: "Email",
+                staff_role: "Rôle",
+                staff_status: "Status",
+                staff_action: "Action",
+                staff_delete: "Supprimer",
+                // Patient Portal
+                pp_welcome: "BIENVENUE CHEZ RENALAI",
+                pp_welcome_sub: "Analysez votre scanner instantanément ou prenez rendez-vous avec nos spécialistes.",
+                pp_ai_scanner: "Auto-Scanner IA",
+                pp_ai_desc: "Uploadez votre scanner pour un diagnostic immédiat par notre intelligence artificielle.",
+                pp_launch: "LANCER L'ANALYSE",
+                pp_booking: "Prendre Rendez-vous",
+                pp_booking_desc: "Choisissez votre médecin spécialiste et réservez votre créneau en ligne.",
+                pp_see_avail: "VOIR LES DISPONIBILITÉS",
+                // Booking
+                book_title: "Choisir un Médecin",
+                book_subtitle: "Sélectionnez le spécialiste que vous souhaitez consulter.",
+                book_specialist: "SPÉCIALISTE",
+                book_hours: "Consultations de 9h à 18h",
+                book_select: "SÉLECTIONNER",
+                // Patient Portal Nav
+                nav_autodiag: "Auto-Diagnostic",
+                nav_booking: "Prendre RDV"
             },
             en: {
+                // Auth
                 subtitle: "Artificial Intelligence & Medical Management",
                 email: "Email Address",
                 password: "Password",
@@ -2535,6 +2702,7 @@
                 new_here: "New here?",
                 create_account: "Create Account",
                 logout: "Logout",
+                // Nav
                 dashboard: "Dashboard",
                 my_patients: "My Patients",
                 ai_analysis: "AI Analysis",
@@ -2545,15 +2713,185 @@
                 doc_patients: "Doctor's Patients",
                 profile: "My Profile",
                 approvals: "Approvals",
-                staff_mgmt: "Staff Mgmt"
+                staff_mgmt: "Staff Mgmt",
+                // Dashboard
+                dash_welcome: "Welcome",
+                dash_service_today: "Here is your service status for today.",
+                dash_total_analyses: "Total Analyses",
+                dash_active_patients: "Active Patients",
+                dash_ai_accuracy: "AI Accuracy",
+                // My Patients
+                mp_title: "My Patients",
+                mp_subtitle: "Records under your care.",
+                mp_search: "Search for a patient...",
+                mp_patient_col: "Patient",
+                mp_dob_col: "Date of Birth",
+                mp_action_col: "Action",
+                mp_open_file: "Open Record",
+                mp_no_patient: "No patients assigned.",
+                mp_assistant: "My Assistant",
+                mp_no_assistant: "No assistant assigned.",
+                mp_assign_nurse: "Assign an assistant",
+                mp_replace: "Replace",
+                mp_leave_requests: "Leave Requests",
+                mp_validate: "Approve",
+                mp_refuse: "Decline",
+                mp_from: "From",
+                mp_to: "to",
+                // AI Scan
+                scan_title: "PyTorch Scanner Analysis",
+                scan_subtitle: "Automatic analysis of renal calculi.",
+                scan_click: "Click to upload a scan",
+                scan_formats: "DICOM, PNG, JPG (Max 50MB)",
+                scan_select_patient: "Select Patient",
+                scan_choose_patient: "-- Choose a patient --",
+                scan_date: "Consultation Date",
+                scan_obs: "Pre-scan Observations",
+                scan_run: "Run Segmentation",
+                scan_report: "AI ANALYSIS REPORT",
+                scan_proba: "Probabilities by Class",
+                scan_notes: "Final Medical Notes & Remarks",
+                scan_save: "Save to Patient Record",
+                scan_detected: "Detected",
+                scan_severity: "Severity",
+                scan_coverage: "Coverage",
+                scan_normal: "Normal",
+                scan_processing: "Processing...",
+                // Doctor Agenda
+                rdv_title: "Today's Agenda",
+                rdv_subtitle: "Manage your consultations. Notes required to validate.",
+                rdv_validate: "Validate Consultation",
+                rdv_absent: "Absent (MJCH)",
+                rdv_notes: "Medical Remarks (Required to validate)",
+                rdv_notes_ph: "Enter your observations...",
+                rdv_no_patient: "No patients scheduled.",
+                rdv_vacations: "Manage my Leave",
+                rdv_vac_start: "Start",
+                rdv_vac_end: "End",
+                rdv_declare_vac: "Declare Leave",
+                // Admissions
+                adm_title: "Manual Admission",
+                adm_subtitle: "Register a patient without a prior appointment.",
+                adm_fname: "First Name",
+                adm_lname: "Last Name",
+                adm_dob: "Date of Birth",
+                adm_doctor: "Specialist Doctor",
+                adm_blood: "Blood Group",
+                adm_blood_ph: "e.g. O+",
+                adm_save: "SAVE PATIENT RECORD",
+                // Validate RDV (assistant)
+                ardv_title: "Appointment Validation",
+                ardv_subtitle: "Manage your assigned doctor's appointment requests.",
+                ardv_no_doctor: "You have no assigned doctor at the moment.",
+                ardv_contact_admin: "Contact the administrator to be assigned to a doctor.",
+                ardv_no_rdv: "No pending appointment requests for your service.",
+                ardv_new: "NEW",
+                ardv_existing: "EXISTING",
+                ardv_date: "Date",
+                ardv_dob: "DOB",
+                // Global Planning
+                gp_title: "Global Planning (2 Months)",
+                gp_subtitle: "Centralised overview.",
+                gp_filter: "Filter...",
+                gp_date_time: "Date & Time",
+                gp_doctor: "Doctor",
+                gp_patient: "Patient",
+                gp_status: "Status",
+                gp_actions: "Actions",
+                gp_no_rdv: "No appointments.",
+                gp_manual_rdv: "Manual Appointment (Assistant)",
+                // Doctor Patients (nurse view)
+                dp_title: "Doctor's Patients",
+                dp_subtitle: "You can only view patients of your assigned doctor.",
+                dp_search: "Search...",
+                dp_patient_col: "Patient",
+                dp_dob_col: "Date of Birth",
+                dp_last_visit: "Last Visit",
+                dp_action: "Action",
+                dp_view_file: "View Record",
+                dp_no_patient: "No patients for this doctor.",
+                dp_no_doctor: "You are not assigned to any doctor at the moment.",
+                dp_request_leave: "Request Leave",
+                dp_quit_title: "Leave the Service (Permanent)",
+                dp_quit_text: "This action is irreversible. Patient history will be preserved and transferred to the replacement.",
+                dp_quit_btn: "Request permanent departure",
+                dp_leave_pending: "Pending Leave:",
+                dp_leave_awaiting: "Awaiting validation",
+                // Profile
+                prof_title: "Your Professional Profile",
+                prof_subtitle: "Manage your information and preferences.",
+                prof_info: "Account Information",
+                prof_fullname: "Full Name",
+                prof_email: "Professional Email",
+                prof_phone: "Phone",
+                prof_phone_ph: "Phone number",
+                prof_clinic: "Clinic / Practice Name",
+                prof_clinic_ph: "E.g. El Hana Clinic",
+                prof_location: "Location / Address",
+                prof_location_ph: "E.g. Algiers, Didouche Mourad St.",
+                prof_hospital_id: "Hospital ID",
+                prof_save: "Save Changes",
+                prof_quit: "Leave Service (Delete Account)",
+                prof_specialty: "Specialty",
+                prof_change_photo: "CHANGE PHOTO",
+                prof_access_nurse: "Access Assistant Account",
+                // Approvals
+                app_title: "Approvals",
+                app_subtitle: "Manage new accounts and forgotten passwords.",
+                app_signup_requests: "Registration Requests",
+                app_name: "Name",
+                app_email_col: "Email",
+                app_role: "Role",
+                app_actions_col: "Actions",
+                app_accept: "Accept",
+                app_refuse: "Decline",
+                app_no_request: "No requests.",
+                app_reset_requests: "Forgotten Password Requests",
+                app_validate_pwd: "Validate New Password",
+                app_quit_requests: "Departure Requests",
+                app_delete_account: "Delete Account",
+                // Staff
+                staff_title: "Staff Management",
+                staff_subtitle: "Full list of authorised personnel.",
+                staff_filter: "Filter...",
+                staff_name: "Name",
+                staff_email_col: "Email",
+                staff_role: "Role",
+                staff_status: "Status",
+                staff_action: "Action",
+                staff_delete: "Delete",
+                // Patient Portal
+                pp_welcome: "WELCOME TO RENALAI",
+                pp_welcome_sub: "Analyse your scan instantly or book an appointment with our specialists.",
+                pp_ai_scanner: "AI Auto-Scanner",
+                pp_ai_desc: "Upload your scan for an immediate diagnosis by our artificial intelligence.",
+                pp_launch: "RUN ANALYSIS",
+                pp_booking: "Book Appointment",
+                pp_booking_desc: "Choose your specialist and book your slot online.",
+                pp_see_avail: "SEE AVAILABILITY",
+                // Booking
+                book_title: "Choose a Doctor",
+                book_subtitle: "Select the specialist you wish to consult.",
+                book_specialist: "SPECIALIST",
+                book_hours: "Consultations 9am – 6pm",
+                book_select: "SELECT",
+                // Patient Portal Nav
+                nav_autodiag: "Self-Diagnosis",
+                nav_booking: "Book Appointment"
             }
         };
 
         let currentLang = localStorage.getItem('lang') || 'fr';
 
+        // Helper: get translated string
+        function t(key) {
+            return (translations[currentLang] && translations[currentLang][key]) ? translations[currentLang][key] : (translations['fr'][key] || key);
+        }
+
         function setLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('lang', lang);
+            // Translate static data-i18n elements (auth page, header)
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (translations[lang] && translations[lang][key]) {
@@ -2568,6 +2906,7 @@
 
             if (user) {
                 buildNav();
+                render(); // Re-render current page in new language
             }
         }
 
