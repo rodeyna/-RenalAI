@@ -1,0 +1,134 @@
+
+services:
+  # ==========================================
+  # INFRASTRUCTURE SERVICESn
+  # ==========================================
+  consul:
+    image: hashicorp/consul:latest
+    container_name: consul
+    ports:
+      - "8500:8500"
+    command: "agent -dev -client 0.0.0.0"
+    networks:
+      - medical_network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - medical_network
+
+  postgres_db:
+    image: postgres:15
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: medical_user
+      POSTGRES_PASSWORD: medical_password
+      POSTGRES_DB: medical_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - medical_network
+
+  # ==========================================
+  # MICROSERVICES
+  # ==========================================
+  auth_service:
+    build:
+      context: ./auth_service
+      dockerfile: Dockerfile
+    container_name: auth_service
+    ports:
+      - "8001:8000"
+    environment:
+      - DATABASE_URL=postgres://medical_user:medical_password@postgres_db:5432/medical_db
+      - RABBITMQ_URL=amqp://admin:admin123@rabbitmq:5672/
+      - CONSUL_HOST=consul
+    depends_on:
+      - postgres_db
+      - rabbitmq
+      - consul
+    networks:
+      - medical_network
+
+  patient_service:
+    build:
+      context: ./patient_service
+      dockerfile: Dockerfile
+    container_name: patient_service
+    ports:
+      - "8002:8000"
+    environment:
+      - DATABASE_URL=postgres://medical_user:medical_password@postgres_db:5432/medical_db
+      - RABBITMQ_URL=amqp://admin:admin123@rabbitmq:5672/
+      - CONSUL_HOST=consul
+    depends_on:
+      - postgres_db
+      - rabbitmq
+      - consul
+    networks:
+      - medical_network
+
+  ai_service:
+    build:
+      context: ./ai_service
+      dockerfile: Dockerfile
+    container_name: ai_service
+    ports:
+      - "8003:8000"
+    environment:
+      - RABBITMQ_URL=amqp://admin:admin123@rabbitmq:5672/
+      - CONSUL_HOST=consul
+    depends_on:
+      - rabbitmq
+      - consul
+    volumes:
+      - shared_results:/app/results
+    networks:
+      - medical_network
+
+  dl_worker:
+    build:
+      context: ./ai_service
+      dockerfile: Dockerfile
+    container_name: dl_worker
+    command: [ "python", "worker.py" ]
+    environment:
+      - RABBITMQ_URL=amqp://admin:admin123@rabbitmq:5672/
+    depends_on:
+      - rabbitmq
+      - ai_service
+    volumes:
+      - shared_results:/app/results
+    networks:
+      - medical_network
+
+  frontend_service:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend_service
+    ports:
+      - "5001:80"
+    environment:
+      - REACT_APP_AUTH_SERVICE_URL=http://localhost:8001
+      - REACT_APP_PATIENT_SERVICE_URL=http://localhost:8002
+      - REACT_APP_AI_SERVICE_URL=http://localhost:8003
+    networks:
+      - medical_network
+
+networks:
+  medical_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  shared_results:

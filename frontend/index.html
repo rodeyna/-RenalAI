@@ -1,0 +1,2602 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RenalAI Pro | Plateforme Médicale</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            /* Palette Médicale Blanc & Vert */
+            --bg-page: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-nav: #ffffff;
+            --primary: #10b981;
+            /* Vert Émeraude Médical */
+            --primary-hover: #059669;
+            --accent: #d1fae5;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 0.75rem;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* UTILS */
+        .hidden {
+            display: none !important;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        .items-center {
+            display: flex;
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        /* LANGUAGE SELECTOR */
+        .lang-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1001;
+        }
+
+        .lang-btn {
+            padding: 5px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: white;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .lang-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .gap-2 {
+            gap: 0.5rem;
+        }
+
+        .gap-4 {
+            gap: 1rem;
+        }
+
+        .mt-4 {
+            margin-top: 1rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* NOTIFICATIONS */
+        #notif-area {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: white;
+            border-left: 4px solid var(--primary);
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow);
+            color: var(--text-primary);
+            animation: slideIn 0.3s ease;
+            min-width: 280px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* HEADER & NAV */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 75px;
+            background: var(--bg-nav);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .logo i {
+            color: var(--primary);
+        }
+
+        .logo span {
+            color: var(--primary);
+        }
+
+        .nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 15px;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary);
+            background: var(--accent);
+        }
+
+        .user-block {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-left: 20px;
+            border-left: 1px solid var(--border);
+        }
+
+        /* AUTH PAGES */
+        .auth-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 100%);
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: white;
+            padding: 3rem;
+            border-radius: 1.5rem;
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        .auth-card h1 {
+            font-size: 2rem;
+            margin: 0 0 0.5rem;
+            color: var(--text-primary);
+        }
+
+        /* FORM ELEMENTS */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: #f1f5f9;
+        }
+
+        /* MAIN CONTENT */
+        .main {
+            padding: 110px 5% 50px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .view-header {
+            margin-bottom: 2.5rem;
+            border-left: 4px solid var(--primary);
+            padding-left: 1.5rem;
+        }
+
+        .view-header h2 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        /* CARDS */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .stat-val {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        /* TABLES */
+        .table-container {
+            background: white;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8fafc;
+            padding: 1.2rem;
+            text-align: left;
+            font-weight: 700;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 1.2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: #f0fdf4;
+        }
+
+        .badge {
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge-pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .badge-approved {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        /* PATIENT PORTAL & RDV */
+        .patient-portal-hero {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 4rem 2rem;
+            border-radius: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .doctor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .doctor-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .doctor-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.1);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-top: 1rem;
+        }
+
+        .calendar-day {
+            padding: 10px;
+            border: 1px solid var(--border);
+            text-align: center;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .calendar-day.disabled {
+            background: #f1f5f9;
+            cursor: not-allowed;
+            color: #cbd5e1;
+        }
+
+        .calendar-day.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .time-slot {
+            padding: 8px;
+            border: 1px solid var(--border);
+            text-align: center;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .time-slot:hover {
+            background: var(--accent);
+            color: var(--primary);
+        }
+
+        .time-slot.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .rdv-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border-left: 5px solid var(--primary);
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .rdv-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .rdv-time {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        .rdv-patient {
+            font-weight: 700;
+        }
+
+        /* PRO FEATURES */
+        .doctor-photo-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid var(--primary);
+            object-fit: cover;
+            margin-bottom: 1rem;
+            background: #f1f5f9;
+        }
+
+        .profile-img-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-img-container input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            margin-top: 1.5rem;
+            height: 400px;
+            /* FIXED HEIGHT TO PREVENT OVERFLOW */
+            position: relative;
+        }
+
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+            align-items: start;
+        }
+
+        .info-card {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+
+        .info-card i {
+            font-size: 2rem;
+            color: var(--primary);
+            background: var(--accent);
+            padding: 1rem;
+            border-radius: 50%;
+        }
+
+        /* AI SCANNER PRO */
+        .scanner-hero {
+            background: white;
+            padding: 3rem;
+            border-radius: 2rem;
+            border: 2px solid var(--border);
+            text-align: center;
+        }
+
+        .upload-zone {
+            border: 2px dashed var(--primary);
+            padding: 4rem;
+            border-radius: 1.5rem;
+            margin: 2rem auto;
+            max-width: 550px;
+            cursor: pointer;
+            background: #f0fdf4;
+        }
+
+        .upload-zone:hover {
+            background: #d1fae5;
+        }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .modal-box {
+            background: white;
+            border-radius: 1.5rem;
+            width: 100%;
+            max-width: 850px;
+            padding: 3rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="notif-area"></div>
+
+    <!-- AUTH SECTION -->
+    <div id="view-auth" class="auth-screen">
+        <div class="lang-selector">
+            <button class="lang-btn active" onclick="setLanguage('fr')">FR</button>
+            <button class="lang-btn" onclick="setLanguage('en')">EN</button>
+        </div>
+        <div id="card-login" class="auth-card">
+            <div class="text-center mb-4">
+                <i class="fa-solid fa-microchip fa-4x"
+                    style="color: var(--primary); text-shadow: 0 0 20px var(--primary);"></i>
+            </div>
+            <h1 class="text-center" style="font-size: 2.5rem; letter-spacing: -1px;">Renal<span>AI</span></h1>
+            <p class="text-center" style="font-size: 1.1rem;" data-i18n="subtitle">Intelligence Artificielle & Gestion Médicale</p>
+
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label data-i18n="email">Adresse Email</label>
+                    <input type="email" id="in-email" placeholder="nom@hopital.com" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="password">Mot de passe</label>
+                    <input type="password" id="in-pass" placeholder="••••••••" required>
+                </div>
+                <button type="submit" id="btn-login" class="btn btn-primary mb-4" data-i18n="login">Se Connecter</button>
+                <button type="button" onclick="startPatientPortal()" class="btn btn-secondary w-full"
+                    style="border-color: var(--primary); color: var(--primary);">
+                    <i class="fa-solid fa-hospital-user"></i> <span data-i18n="patient_access">ACCÈS PATIENT (Sans Compte)</span>
+                </button>
+            </form>
+
+            <div class="text-center mt-4" style="display:flex; flex-direction:column; gap:10px;">
+                <a href="#" onclick="switchAuth('reset')"
+                    style="color: var(--text-secondary); font-size: 0.9rem; text-decoration: none;" data-i18n="forgot_pass">Mot de passe oublié
+                    ?</a>
+                <div>
+                    <span style="color: var(--text-secondary); font-size: 0.9rem;" data-i18n="new_here">Nouveau ? </span>
+                    <a href="#" onclick="switchAuth('signup')"
+                        style="color: var(--primary); font-weight: 600; text-decoration: none;" data-i18n="create_account">Créer un compte</a>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="card-reset" class="auth-card hidden">
+            <h1 class="text-center">Récupération</h1>
+            <p class="text-center">Saisissez votre nouveau mot de passe. Il sera validé par l'administrateur.</p>
+            <form onsubmit="handleResetRequest(event)">
+                <div class="form-group"><label>Email</label><input type="email" id="reset-email" required></div>
+                <div class="form-group"><label>Nouveau Mot de passe</label><input type="password" id="reset-pass"
+                        required></div>
+                <button type="submit" id="btn-reset" class="btn btn-primary">Demander Réinitialisation</button>
+            </form>
+            <div class="text-center mt-4">
+                <a href="#" onclick="switchAuth('login')"
+                    style="color: var(--primary); font-weight: 600; text-decoration: none;">Retour</a>
+            </div>
+        </div>
+
+        <div id="card-signup" class="auth-card hidden">
+            <h1 class="text-center">Rejoindre l'Élite</h1>
+            <p class="text-center">Créez votre profil professionnel RenalAI.</p>
+            <form onsubmit="handleSignup(event)">
+                <div class="text-center mb-4">
+                    <div class="profile-img-container">
+                        <img id="signup-photo-preview" src="https://via.placeholder.com/100"
+                            class="doctor-photo-preview" alt="Photo">
+                        <input type="file" id="up-photo" accept="image/*" onchange="previewSignupPhoto(this)">
+                        <div style="font-size: 0.7rem; color: var(--primary); font-weight: 700;">CLIQUEZ POUR PHOTO
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <div class="form-group" style="flex:1"><label>Prénom</label><input type="text" id="up-fname"
+                            required></div>
+                    <div class="form-group" style="flex:1"><label>Nom</label><input type="text" id="up-lname" required>
+                    </div>
+                </div>
+                <div class="form-group"><label>Email Professionnel</label><input type="email" id="up-email" required>
+                </div>
+                <div class="form-group"><label>Mot de passe</label><input type="password" id="up-pass" required></div>
+                <div class="form-group">
+                    <label>Rôle</label>
+                    <select id="up-role" onchange="toggleAssistantSelection(this.value)">
+                        <option value="doctor">Médecin Spécialiste</option>
+                        <option value="assistant">Assistant Médical</option>
+                    </select>
+                </div>
+                <div id="assistant-choice-area" class="form-group">
+                    <label>Choisir une Assistant(e) (Disponible uniquement)</label>
+                    <select id="up-assistants">
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+                <button type="submit" id="btn-signup" class="btn btn-primary">Créer mon Compte</button>
+            </form>
+            <div class="text-center mt-4">
+                <a href="#" onclick="switchAuth('login')"
+                    style="color: var(--primary); font-weight: 700; text-decoration: none;">Retour à la connexion</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP SECTION -->
+    <div id="view-app" class="hidden">
+        <header class="header">
+            <a href="#" class="logo" onclick="navigate('dash')"><i class="fa-solid fa-staff-snake"></i>
+                Renal<span>AI Pro.</span></a>
+            <nav class="nav" id="nav-items"></nav>
+            <div class="user-block">
+                <!-- Notification Bell -->
+                <div id="notif-bell" onclick="openNotificationWindow()"
+                    style="position:relative; cursor:pointer; margin-right:15px; font-size:1.2rem; color:var(--text-secondary);">
+                    <i class="fa-solid fa-bell"></i>
+                    <span id="notif-count"
+                        style="display:none; position:absolute; top:-8px; right:-8px; background:var(--danger); color:white; font-size:0.65rem; padding:2px 6px; border-radius:10px; font-weight:bold; border:2px solid white;">0</span>
+                </div>
+                
+                <div style="display: flex; gap: 5px; margin-right: 15px;">
+                    <button class="lang-btn active" onclick="setLanguage('fr')">FR</button>
+                    <button class="lang-btn" onclick="setLanguage('en')">EN</button>
+                </div>
+
+                <div style="text-align: right; cursor: pointer;" onclick="navigate('profile')">
+                    <div id="disp-name" style="font-weight: 700; font-size: 0.95rem;">--</div>
+                    <div id="disp-role"
+                        style="font-size: 0.75rem; color: var(--primary); text-transform: uppercase; font-weight: 800;">
+                        --
+                    </div>
+                </div>
+                <div id="header-avatar" onclick="navigate('profile')"
+                    style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid var(--primary); overflow: hidden;">
+                    <i class="fa-solid fa-user" style="color: var(--primary)"></i>
+                </div>
+                <button onclick="logout()" class="btn btn-secondary btn-sm" title="Déconnexion"
+                    style="padding: 10px;"><i class="fa-solid fa-sign-out-alt"></i> <span data-i18n="logout" style="font-size: 0.7rem; margin-left: 5px;">Déconnexion</span></button>
+            </div>
+        </header>
+
+        <main class="main">
+            <div id="page-content"></div>
+        </main>
+    </div>
+
+    <!-- MODAL -->
+    <div id="modal-container" class="modal-overlay hidden">
+        <div class="modal-box" id="modal-inner"></div>
+    </div>
+
+    <script>
+        const API_U = 'http://localhost:8001/api/auth/users/';
+        const API_P = 'http://localhost:8002/api/patients/';
+        const API_C = 'http://localhost:8002/api/consultations/';
+        const API_I = 'http://localhost:8003/api/analyze';
+
+        let user = null;
+        let view = 'dash';
+
+        function notify(msg, type = 'primary') {
+            const area = document.getElementById('notif-area');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            if (type === 'danger') toast.style.borderLeftColor = 'var(--danger)';
+            if (type === 'success') toast.style.borderLeftColor = 'var(--success)';
+            toast.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${msg}</span>`;
+            area.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        function switchAuth(v) {
+            document.getElementById('card-login').classList.toggle('hidden', v !== 'login');
+            document.getElementById('card-signup').classList.toggle('hidden', v !== 'signup');
+            document.getElementById('card-reset').classList.toggle('hidden', v !== 'reset');
+            if (v === 'signup') loadAssistantsForSignup();
+        }
+
+        async function loadAssistantsForSignup() {
+            try {
+                const r = await fetch(API_U);
+                const us = await r.json();
+                const as = us.filter(u => u.role === 'assistant' && u.status === 'approved' && !u.doctor);
+
+                const sel = document.getElementById('up-assistants');
+                if (sel) {
+                    sel.innerHTML = as.map(a => `<option value="${a.id}">Assist. ${a.first_name} ${a.last_name}</option>`).join('');
+                }
+                toggleAssistantSelection(document.getElementById('up-role').value);
+            } catch (e) { console.error("Error loading assistants", e); }
+        }
+
+        function toggleAssistantSelection(role) {
+            const area = document.getElementById('assistant-choice-area');
+            if (area) {
+                if (role === 'doctor') area.classList.remove('hidden');
+                else area.classList.add('hidden');
+            }
+        }
+
+        async function openNotificationWindow() {
+            const w = window.open('', 'RenalAINotifs', 'width=600,height=700');
+
+            // Fetch data needed for notifications
+            let pendingLeaves = [];
+            let nurseQuitRequests = [];
+
+            if (user.role === 'doctor') {
+                const lr = await fetch(`${API_U}list_leave_requests/?doctor_id=${user.id}`);
+                const leaves = await lr.json();
+                pendingLeaves = leaves.filter(l => l.status === 'pending');
+                nurseQuitRequests = user.assistants ? user.assistants.filter(a => a.quit_requested) : [];
+            } else if (user.role === 'assistant') {
+                const lr = await fetch(`${API_U}list_leave_requests/`);
+                const leaves = await lr.json();
+                pendingLeaves = leaves.filter(l => l.assistant_id == user.id);
+            }
+
+            const html = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Centre de Notifications - RenalAI</title>
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <style>
+                        :root { --primary: #10b981; --danger: #ef4444; --bg: #f8fafc; --text: #1e293b; }
+                        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+                        .header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+                        .notif-card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border-left: 5px solid #cbd5e1; }
+                        .notif-card.urgent { border-left-color: var(--danger); }
+                        .notif-card.info { border-left-color: var(--primary); }
+                        .title { font-weight: 700; font-size: 1.1rem; margin-bottom: 5px; }
+                        .desc { font-size: 0.9rem; color: #64748b; margin-bottom: 10px; }
+                        .btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
+                        .btn-primary { background: var(--primary); color: white; }
+                        .btn-danger { background: #fee2e2; color: var(--danger); }
+                        .empty { text-align: center; padding: 50px; color: #94a3b8; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <i class="fa-solid fa-bell" style="color:var(--primary); font-size:1.5rem;"></i>
+                        <h2 style="margin:0;">Centre de Notifications</h2>
+                    </div>
+
+                    ${user.role === 'doctor' ? `
+                        <section>
+                            <h3 style="font-size:0.9rem; color:#64748b; text-transform:uppercase;">Demandes en attente</h3>
+                            
+                            ${pendingLeaves.length === 0 && nurseQuitRequests.length === 0 ? '<div class="empty">Aucune notification pour le moment.</div>' : ''}
+                            
+                            ${pendingLeaves.map(l => `
+                                <div class="notif-card info">
+                                    <div class="title"><i class="fa-solid fa-umbrella-beach"></i> Demande de Congé</div>
+                                    <div class="desc"><strong>${l.assistant_name}</strong> souhaite un congé du ${l.start_date} au ${l.end_date}.</div>
+                                    <div style="display:flex; gap:10px;">
+                                        <button class="btn btn-primary" onclick="window.opener.approveLeaveRequest(${l.assistant_id}); window.close();">Approuver</button>
+                                        <button class="btn btn-danger" onclick="window.opener.rejectLeaveRequest(${l.assistant_id}); window.close();">Refuser</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+
+                            ${nurseQuitRequests.map(a => `
+                                <div class="notif-card urgent">
+                                    <div class="title"><i class="fa-solid fa-person-walking-arrow-right"></i> Demande de Démission</div>
+                                    <div class="desc"><strong>${a.first_name} ${a.last_name}</strong> a demandé à quitter définitivement le service.</div>
+                                    <button class="btn btn-primary" onclick="window.opener.approveNurseQuit(${a.id}); window.close();">Remplacer & Valider le départ</button>
+                                </div>
+                            `).join('')}
+                        </section>
+                    ` : `
+                        <section>
+                            <h3 style="font-size:0.9rem; color:#64748b; text-transform:uppercase;">Vos demandes</h3>
+                            ${pendingLeaves.length === 0 ? '<div class="empty">Aucune demande en cours.</div>' : ''}
+                            ${pendingLeaves.map(l => `
+                                <div class="notif-card info">
+                                    <div class="title"><i class="fa-solid fa-umbrella-beach"></i> Votre Congé</div>
+                                    <div class="desc">Période : ${l.start_date} au ${l.end_date}</div>
+                                    <div class="badge" style="background:#fef3c7; color:#92400e; padding:4px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">Statut: ${l.status.toUpperCase()}</div>
+                                </div>
+                            `).join('')}
+                        </section>
+                    `}
+
+                    <button class="btn" style="width:100%; margin-top:20px; background:#e2e8f0; color:#475569;" onclick="window.close()">Fermer</button>
+                </body>
+                </html>
+            `;
+            w.document.write(html);
+        }
+
+        // Auto-update notification count
+        async function updateNotifCount() {
+            if (!user) return;
+            let count = 0;
+            if (user.role === 'doctor') {
+                const lr = await fetch(`${API_U}list_leave_requests/?doctor_id=${user.id}`);
+                const leaves = await lr.json();
+                count += leaves.filter(l => l.status === 'pending').length;
+                count += (user.assistants ? user.assistants.filter(a => a.quit_requested).length : 0);
+            } else if (user.role === 'assistant') {
+                const lr = await fetch(`${API_U}list_leave_requests/`);
+                const leaves = await lr.json();
+                count += leaves.filter(l => l.assistant_id == user.id).length;
+            }
+
+            const badge = document.getElementById('notif-count');
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+        setInterval(updateNotifCount, 10000); // Check every 10s
+
+        async function handleLogin(e) {
+            if (e) e.preventDefault();
+            console.log("Login attempt started...");
+            const email = document.getElementById('in-email').value;
+            const password = document.getElementById('in-pass').value;
+            const btn = document.getElementById('btn-login');
+
+            if (!btn) { console.error("Login button not found"); return false; }
+
+            btn.disabled = true;
+            btn.textContent = "Vérification...";
+
+            try {
+                console.log("Fetching API_U login...");
+                const r = await fetch(API_U + 'login/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const d = await r.json();
+                console.log("Login response:", d);
+
+                if (r.ok) {
+                    user = d.user;
+                    localStorage.setItem('r_user', JSON.stringify(user));
+                    start();
+                } else {
+                    notify(d.error || "Erreur de connexion", 'danger');
+                }
+            } catch (err) {
+                console.error("Login error:", err);
+                notify("Serveur indisponible", 'danger');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Se Connecter";
+            }
+            return false;
+        }
+
+        async function handleSignup(e) {
+            e.preventDefault();
+            const photoInput = document.getElementById('up-photo');
+            const data = {
+                username: document.getElementById('up-email').value.split('@')[0] + Math.floor(Math.random() * 100),
+                email: document.getElementById('up-email').value,
+                password: document.getElementById('up-pass').value,
+                first_name: document.getElementById('up-fname').value,
+                last_name: document.getElementById('up-lname').value,
+                role: document.getElementById('up-role').value
+            };
+
+            if (data.role === 'doctor') {
+                const asel = document.getElementById('up-assistants');
+                if (asel && asel.value) {
+                    data.assigned_assistants = [parseInt(asel.value)];
+                }
+            }
+
+            // Simuler l'envoi de la photo
+            if (photoInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = async (ev) => {
+                    data.photo = ev.target.result;
+                    sendSignup(data);
+                };
+                reader.readAsDataURL(photoInput.files[0]);
+            } else {
+                sendSignup(data);
+            }
+        }
+
+        async function sendSignup(data) {
+            try {
+                const r = await fetch(API_U + 'signup/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const res = await r.json();
+                if (r.ok) {
+                    notify("Demande envoyée. Accès en cours de validation.", 'success');
+                    switchAuth('login');
+                } else { notify(res.error || "Erreur lors de l'inscription", 'danger'); }
+            } catch (e) { notify("Erreur réseau", 'danger'); }
+        }
+        async function handleResetRequest(e) {
+            e.preventDefault();
+            const email = document.getElementById('reset-email').value;
+            const new_password = document.getElementById('reset-pass').value;
+            try {
+                const r = await fetch(API_U + 'request_reset/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, new_password })
+                });
+                if (r.ok) {
+                    notify("Demande envoyée. L'administrateur doit valider.", "success");
+                    switchAuth('login');
+                } else { notify("Utilisateur non trouvé", "danger"); }
+            } catch (e) { notify("Erreur réseau", "danger"); }
+        }
+
+        function logout() { localStorage.removeItem('r_user'); location.reload(); }
+
+        function start() {
+            document.getElementById('view-auth').classList.add('hidden');
+            document.getElementById('view-app').classList.remove('hidden');
+            document.getElementById('disp-name').textContent = `${user.first_name} ${user.last_name}`;
+            document.getElementById('disp-role').textContent = user.role;
+
+            // Avatar par défaut
+            document.getElementById('header-avatar').innerHTML = `<i class="fa-solid fa-user" style="color: var(--primary)"></i>`;
+
+            buildNav();
+            navigate('dash');
+        }
+
+        function buildNav() {
+            const nav = document.getElementById('nav-items');
+            if (user.role === 'guest') {
+                nav.innerHTML = `
+                    <a class="nav-link ${view === 'patient-portal' ? 'active' : ''}" onclick="navigate('patient-portal')"><i class="fa-solid fa-stethoscope"></i> Auto-Diagnostic</a>
+                    <a class="nav-link ${view === 'patient-booking' ? 'active' : ''}" onclick="navigate('patient-booking')"><i class="fa-solid fa-calendar-check"></i> Prendre RDV</a>
+                `;
+                return;
+            }
+            const links = [{ id: 'dash', label: 'Tableau de Bord', icon: 'fa-chart-line', key: 'dashboard' }];
+            if (user.role === 'admin') {
+                links.push({ id: 'approvals', label: 'Vérifications', icon: 'fa-shield-halved', key: 'approvals' });
+                links.push({ id: 'staff', label: 'Gestion Staff', icon: 'fa-user-gear', key: 'staff_mgmt' });
+            } else if (user.role === 'doctor') {
+                links.push({ id: 'my-patients', label: 'Mes Patients', icon: 'fa-user-doctor', key: 'my_patients' });
+                links.push({ id: 'new-scan', label: 'Analyse IA', icon: 'fa-microscope', key: 'ai_analysis' });
+                links.push({ id: 'doctor-rdv', label: 'Agenda RDV', icon: 'fa-calendar-day', key: 'appointments' });
+            } else if (user.role === 'assistant') {
+                links.push({ id: 'admission', label: 'Admissions', icon: 'fa-user-plus', key: 'admissions' });
+                links.push({ id: 'assistant-rdv', label: 'Valider RDV', icon: 'fa-check-double', key: 'validate_rdv' });
+                links.push({ id: 'assistant-all-rdv', label: 'Planning Global', icon: 'fa-calendar-days', key: 'global_planning' });
+                links.push({ id: 'my-doctor-patients', label: 'Patients Dr.', icon: 'fa-user-injured', key: 'doc_patients' });
+            }
+            nav.innerHTML = links.map(l => `
+                <a class="nav-link ${view === l.id ? 'active' : ''}" onclick="navigate('${l.id}')">
+                    <i class="fa-solid ${l.icon}"></i> 
+                    <span data-i18n="${l.key}">${currentLang === 'en' ? translations.en[l.key] : l.label}</span>
+                </a>
+            `).join('');
+        }
+
+        function navigate(v) {
+            view = v;
+            buildNav();
+            render();
+        }
+
+        async function render() {
+            const root = document.getElementById('page-content');
+            root.innerHTML = '<div style="text-align:center; padding: 150px;"><i class="fa-solid fa-spinner fa-spin fa-3x" style="color:var(--primary)"></i></div>';
+
+            switch (view) {
+                case 'dash': await viewDash(root); break;
+                case 'approvals': await viewApprovals(root); break;
+                case 'staff': await viewStaff(root); break;
+                case 'my-patients': await viewMyPatients(root); break;
+                case 'new-scan': viewNewScan(root); break;
+                case 'admission': viewAdmission(root); break;
+                case 'all-patients': await viewAllPatients(root); break;
+                case 'profile': await viewProfile(root); break;
+                case 'patient-portal': viewPatientPortal(root); break;
+                case 'patient-booking': await viewPatientBooking(root); break;
+                case 'assistant-rdv': viewAssistantRDV(root); break;
+                case 'assistant-all-rdv': viewAssistantAllRDV(root); break;
+                case 'doctor-rdv': viewDoctorRDV(root); break;
+                case 'my-doctor-patients': await viewDoctorPatientsForNurse(root); break;
+                case 'impersonate-nurse': await viewImpersonateNurse(root); break;
+            }
+        }
+
+        // --- PATIENT PORTAL ---
+        function startPatientPortal() {
+            console.log('Patient portal button clicked');
+            user = { role: 'guest', first_name: 'Patient', last_name: 'Visiteur' };
+            document.getElementById('view-auth').classList.add('hidden');
+            document.getElementById('view-app').classList.remove('hidden');
+            document.getElementById('disp-name').textContent = "Patient Visiteur";
+            document.getElementById('disp-role').textContent = "CONSULTATION PUBLIQUE";
+
+            const nav = document.getElementById('nav-items');
+            nav.innerHTML = `
+                <a class="nav-link active" onclick="navigate('patient-portal')"><i class="fa-solid fa-stethoscope"></i> Auto-Diagnostic</a>
+                <a class="nav-link" onclick="navigate('patient-booking')"><i class="fa-solid fa-calendar-check"></i> Prendre RDV</a>
+            `;
+            navigate('patient-portal');
+        }
+
+        function viewPatientPortal(root) {
+            root.innerHTML = `
+                <div class="patient-portal-hero">
+                    <h1 style="font-size:3rem; font-weight:800; margin-bottom:1rem;">BIENVENUE CHEZ RENALAI</h1>
+                    <p style="font-size:1.2rem; opacity:0.9;">Analysez votre scanner instantanément ou prenez rendez-vous avec nos spécialistes.</p>
+                </div>
+                <div class="grid">
+                    <div class="card text-center" style="padding:3rem;">
+                        <i class="fa-solid fa-robot fa-4x mb-4" style="color:var(--primary)"></i>
+                        <h2>Auto-Scanner IA</h2>
+                        <p class="mb-4">Uploadez votre scanner pour un diagnostic immédiat par notre intelligence artificielle.</p>
+                        <input type="file" id="guest-scan-input" class="hidden" onchange="runGuestAI()">
+                        <button class="btn btn-primary" onclick="document.getElementById('guest-scan-input').click()">LANCER L'ANALYSE</button>
+                    </div>
+                    <div class="card text-center" style="padding:3rem;">
+                        <i class="fa-solid fa-calendar-plus fa-4x mb-4" style="color:var(--primary)"></i>
+                        <h2>Prendre Rendez-vous</h2>
+                        <p class="mb-4">Choisissez votre médecin spécialiste et réservez votre créneau en ligne.</p>
+                        <button class="btn btn-secondary w-full" onclick="viewPatientBooking(document.getElementById('page-content'))">VOIR LES DISPONIBILITÉS</button>
+                    </div>
+                </div>
+                <div id="guest-ai-result" class="hidden card mt-4" style="border:2px solid var(--primary);"></div>
+            `;
+        }
+
+        async function runGuestAI() {
+            const res = document.getElementById('guest-ai-result');
+            res.classList.remove('hidden');
+            res.innerHTML = '<div class="text-center p-4"><i class="fa-solid fa-brain fa-spin fa-2x"></i><p>Analyse en cours par le modèle Renal-AI Pro...</p></div>';
+
+            setTimeout(() => {
+                res.innerHTML = `
+                    <div style="text-align:center;">
+                        <h2 style="color:var(--danger);">RÉSULTAT DU SCANNER</h2>
+                        <div style="font-size:1.8rem; font-weight:800; margin:1rem 0;">CALCUL RÉNAL DÉTECTÉ (96.8%)</div>
+                        <div class="card" style="background:#f0fdf4; border:none; text-align:left; padding:1.5rem;">
+                            <h3 style="color:var(--primary);"><i class="fa-solid fa-lightbulb"></i> Conseils Médicaux Immédiats</h3>
+                            <ul style="line-height:1.8; color:var(--text-primary); font-weight:500;">
+                                <li>Hydratation Intense : Buvez au moins 2.5L d'eau par jour.</li>
+                                <li>Régime Alimentaire : Réduisez la consommation de sel et de protéines animales.</li>
+                                <li>Suivi Médical : Ce résultat est indicatif. Veuillez consulter un néphrologue rapidement.</li>
+                            </ul>
+                            <button class="btn btn-primary mt-4 w-full" onclick="viewPatientBooking(document.getElementById('page-content'))">PRENDRE RDV AVEC UN SPÉCIALISTE</button>
+                        </div>
+                    </div>
+                `;
+            }, 3000);
+        }
+
+        async function viewPatientBooking(root) {
+            const r = await fetch(API_U); const users = await r.json();
+            const docs = users.filter(u => u.role === 'doctor' && u.status === 'approved');
+
+            root.innerHTML = `
+                <div class="view-header"><h2>Choisir un Médecin</h2><p>Sélectionnez le spécialiste que vous souhaitez consulter.</p></div>
+                <div class="doctor-grid">
+                    ${docs.map(d => `
+                        <div class="doctor-card" onclick="openBookingCalendar(${JSON.stringify(d).replace(/"/g, '&quot;')})">
+                            <img src="${d.photo || 'https://via.placeholder.com/100'}" class="doctor-photo-preview">
+                            <h3 style="margin:10px 0 5px;">Dr. ${d.first_name} ${d.last_name.toUpperCase()}</h3>
+                            <p style="color:var(--primary); font-weight:700; font-size:0.8rem;">${d.specialty || 'SPÉCIALISTE'}</p>
+                            <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:10px;">Consultations de 9h à 18h</div>
+                            <button class="btn btn-secondary btn-sm mt-4 w-full">SÉLECTIONNER</button>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        let bookingDocId = null;
+        let calendarMonth = null;
+
+        function openBookingCalendar(doc) {
+            bookingDocId = doc.id;
+            const now = new Date();
+            calendarMonth = { year: now.getFullYear(), month: now.getMonth() };
+            selectedRDV = { dateStr: null, time: null };
+            document.getElementById('modal-container').classList.remove('hidden');
+            document.getElementById('modal-inner').innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h3>Prendre RDV avec Dr. ${doc.last_name}</h3>
+                    <button onclick="closeModal()" class="btn btn-secondary btn-sm">X</button>
+                </div>
+                <div class="grid" style="grid-template-columns: 1.3fr 1fr; gap:20px;">
+                    <div>
+                        <p><strong>1. Date &amp; Heure</strong></p>
+                        <div id="cal-wrapper"></div>
+                        <div id="time-slots-wrapper" style="margin-top:1rem;"></div>
+                    </div>
+                    <div id="booking-form-area" class="hidden">
+                        <p><strong>2. Identification Patient</strong></p>
+                        <div class="flex gap-2 mb-2">
+                            <input type="text" id="pat-name" placeholder="Nom &amp; Prenom" style="flex:1">
+                            <button onclick="checkPatientExists()" class="btn btn-secondary btn-sm">Verifier</button>
+                        </div>
+                        <div id="check-result" style="font-size:0.8rem; margin-bottom:1rem;"></div>
+                        <div id="new-patient-fields" class="hidden">
+                            <div style="font-size:0.8rem;margin-bottom:1rem;background:#fffbeb;padding:10px;border-radius:5px;border:1px solid #fef3c7;">
+                                <i class="fa-solid fa-user-plus"></i> Dossier introuvable. <strong>Creez votre compte</strong> ci-dessous.
+                            </div>
+                            <div class="form-group"><label>Date de Naissance</label><input type="date" id="pat-dob"></div>
+                            <div class="form-group"><label>Lieu de Naissance</label><input type="text" id="pat-pob"></div>
+                            <div class="form-group"><label>Groupe Sanguin</label>
+                                <select id="pat-blood">
+                                    <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+                                    <option>O+</option><option>O-</option><option>AB+</option><option>AB-</option>
+                                </select>
+                            </div>
+                            <div class="form-group"><label>Telephone</label><input type="text" id="pat-phone"></div>
+                        </div>
+                        <input type="checkbox" id="is-new-pat" class="hidden">
+                        <button id="btn-confirm-rdv" onclick="submitRDV()" class="btn btn-primary w-full hidden">CONFIRMER LE RDV</button>
+                    </div>
+                </div>
+            `;
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const { year, month } = calendarMonth;
+            const MONTHS = ['Janvier', 'Fevrier', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Aout', 'Septembre', 'Octobre', 'Novembre', 'Decembre'];
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            let firstDow = new Date(year, month, 1).getDay();
+            if (firstDow === 0) firstDow = 7;
+
+            const rdvs = JSON.parse(localStorage.getItem('renal_rdvs') || '[]');
+            const bookedSlots = {};
+            rdvs.forEach(r => {
+                if (String(r.docId) === String(bookingDocId)) {
+                    if (!bookedSlots[r.date]) bookedSlots[r.date] = new Set();
+                    bookedSlots[r.date].add(r.time);
+                }
+            });
+
+            const thisMonthDate = new Date(now.getFullYear(), now.getMonth(), 1);
+            const nextMonthDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+            const curDate = new Date(year, month, 1);
+            const canPrev = curDate > thisMonthDate;
+            const canNext = curDate < nextMonthDate;
+
+            let html = `<div class="flex justify-between items-center mb-2" style="font-weight:700;">
+                    <button onclick="changeCalMonth(-1)" class="btn btn-secondary btn-sm" ${canPrev ? '' : 'disabled style="opacity:0.3;cursor:not-allowed;"'}>&lt;</button>
+                    <span style="font-size:1rem;">${MONTHS[month]} ${year}</span>
+                    <button onclick="changeCalMonth(1)" class="btn btn-secondary btn-sm" ${canNext ? '' : 'disabled style="opacity:0.3;cursor:not-allowed;"'}>&gt;</button>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;font-size:0.65rem;color:var(--text-secondary);margin-bottom:4px;">
+                    <div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div><div>D</div>
+                </div>
+                <div class="calendar-grid">`;
+
+            for (let i = 1; i < firstDow; i++) html += `<div></div>`;
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dd = String(d).padStart(2, '0'), mm = String(month + 1).padStart(2, '0');
+                const dateStr = `${dd}/${mm}/${year}`;
+                const isPast = new Date(year, month, d) < today;
+                const isSel = selectedRDV.dateStr === dateStr;
+                html += `<div class="calendar-day ${isPast ? 'disabled' : ''} ${isSel ? 'active' : ''}" onclick="selectDate(this,'${dateStr}')">${d}</div>`;
+            }
+            html += `</div>`;
+            document.getElementById('cal-wrapper').innerHTML = html;
+
+            const tsw = document.getElementById('time-slots-wrapper');
+            if (selectedRDV.dateStr) {
+                const booked = bookedSlots[selectedRDV.dateStr] || new Set();
+                tsw.innerHTML = `<div class="time-slots">` + ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'].map(t => {
+                    const taken = booked.has(t);
+                    return `<div class="time-slot ${taken ? 'disabled' : ''} ${selectedRDV.time === t ? 'active' : ''}"
+                        onclick="${taken ? '' : `selectTime(this,'${t}')`}"
+                        style="${taken ? 'opacity:0.4;cursor:not-allowed;text-decoration:line-through;font-size:0.8rem;' : ''}">
+                        ${t}${taken ? '<br><small style="font-size:0.6rem;color:#ef4444;">Indisponible</small>' : ''}
+                    </div>`;
+                }).join('') + `</div>`;
+            } else {
+                tsw.innerHTML = `<p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem;">Selectionnez une date pour voir les creneaux disponibles.</p>`;
+            }
+        }
+
+        function changeCalMonth(dir) {
+            const now = new Date();
+            let { year, month } = calendarMonth;
+            month += dir;
+            if (month < 0) { month = 11; year--; }
+            if (month > 11) { month = 0; year++; }
+            const target = new Date(year, month, 1);
+            const base = new Date(now.getFullYear(), now.getMonth(), 1);
+            const max = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+            if (target < base || target > max) return;
+            calendarMonth = { year, month };
+            selectedRDV = { dateStr: null, time: null };
+            const fa = document.getElementById('booking-form-area');
+            if (fa) fa.classList.add('hidden');
+            renderCalendar();
+        }
+
+        async function checkPatientExists() {
+            const name = document.getElementById('pat-name').value;
+            if (!name) return notify("Entrez votre nom", "warning");
+
+            const res = await fetch(API_P);
+            const ps = await res.json();
+            const found = ps.find(p => `${p.first_name} ${p.last_name}`.toLowerCase().includes(name.toLowerCase()));
+
+            const resultArea = document.getElementById('check-result');
+            const newFields = document.getElementById('new-patient-fields');
+            const confirmBtn = document.getElementById('btn-confirm-rdv');
+            const isNewCheck = document.getElementById('is-new-pat');
+
+            if (found) {
+                resultArea.innerHTML = `<span style="color:var(--success)"><i class="fa-solid fa-check-circle"></i> Compte trouvé : Bienvenue M/Mme ${found.last_name}</span>`;
+                newFields.classList.add('hidden');
+                confirmBtn.classList.remove('hidden');
+                isNewCheck.checked = false;
+            } else {
+                resultArea.innerHTML = `<span style="color:var(--danger)"><i class="fa-solid fa-triangle-exclamation"></i> Dossier introuvable. IL FAUT CRÉER UN COMPTE.</span>`;
+                newFields.classList.remove('hidden');
+                confirmBtn.classList.remove('hidden');
+                isNewCheck.checked = true;
+            }
+        }
+
+        let selectedRDV = { date: null, time: null, dateStr: null };
+        function selectDate(el, dateStr) {
+            if (el.classList.contains('disabled')) return;
+            selectedRDV.dateStr = dateStr;
+            selectedRDV.time = null;
+            renderCalendar();
+        }
+        function selectTime(el, t) {
+            if (el.classList.contains('disabled')) return;
+            selectedRDV.time = t;
+            renderCalendar();
+            if (selectedRDV.dateStr && selectedRDV.time) document.getElementById('booking-form-area').classList.remove('hidden');
+        }
+
+        function submitRDV() {
+            const name = document.getElementById('pat-name').value;
+            const isNew = document.getElementById('is-new-pat').checked;
+
+            if (!name) return notify("Veuillez entrer votre nom", "danger");
+            if (!selectedRDV.dateStr || !selectedRDV.time) return notify("Veuillez sélectionner une date et un créneau", "danger");
+
+            const dob = document.getElementById('pat-dob') ? document.getElementById('pat-dob').value : '';
+            const pob = document.getElementById('pat-pob') ? document.getElementById('pat-pob').value : '';
+            const blood = document.getElementById('pat-blood') ? document.getElementById('pat-blood').value : '';
+            const phone = document.getElementById('pat-phone') ? document.getElementById('pat-phone').value : '';
+
+            if (isNew && (!dob || !pob || !phone)) {
+                return notify("Veuillez remplir tous les champs (Date naissance, Lieu, Tél) pour créer votre compte.", "warning");
+            }
+
+            const rdv = {
+                id: Date.now(),
+                docId: bookingDocId,
+                patient: name,
+                date: selectedRDV.dateStr,
+                time: selectedRDV.time,
+                status: 'pending',
+                isNew: isNew,
+                dob, pob, blood, phone
+            };
+
+            const rdvs = JSON.parse(localStorage.getItem('renal_rdvs') || '[]');
+            rdvs.push(rdv);
+            localStorage.setItem('renal_rdvs', JSON.stringify(rdvs));
+
+            notify(`RDV du ${selectedRDV.dateStr} à ${selectedRDV.time} envoyé avec succès !`, "success");
+            closeModal();
+            navigate('patient-portal');
+        }
+
+        // --- ASSISTANT RDV ---
+        function viewAssistantRDV(root) {
+            const allRdvs = JSON.parse(localStorage.getItem('renal_rdvs') || '[]').filter(r => r.status === 'pending');
+            const myDoc = user.doctor; // One doctor only
+
+            const renderRDVs = (d) => {
+                if (!d) return `
+                    <div class="card" style="text-align:center; padding: 3rem;">
+                        <i class="fa-solid fa-user-slash fa-3x mb-4" style="color:var(--border);"></i>
+                        <p style="color:var(--text-secondary); font-weight:600;">Vous n'avez aucun médecin attitré pour le moment.</p>
+                        <p style="font-size:0.85rem; color:var(--text-secondary);">Contactez l'administrateur pour être assigné(e) à un médecin.</p>
+                    </div>
+                `;
+                const rdvs = allRdvs.filter(r => r.docId == d.id);
+                if (rdvs.length === 0) return `
+                    <div class="card" style="border-left: 5px solid var(--primary);">
+                        <h3 style="color:var(--primary); margin-bottom: 1rem;"><i class="fa-solid fa-user-doctor"></i> Dr. ${d.first_name} ${d.last_name.toUpperCase()}</h3>
+                        <p>Aucune demande de rendez-vous en attente pour votre service.</p>
+                    </div>
+                `;
+                return `
+                    <div class="card" style="border-left: 5px solid var(--primary);">
+                        <h3 style="color:var(--primary); margin-bottom: 1.5rem;"><i class="fa-solid fa-user-doctor"></i> Dr. ${d.first_name} ${d.last_name.toUpperCase()}</h3>
+                        <div class="grid" style="grid-template-columns: 1fr;">
+                            ${rdvs.map(r => `
+                                <div class="rdv-item" style="border-bottom: 1px solid #eee; padding-bottom:1rem; margin-bottom:1rem;">
+                                    <div class="rdv-info">
+                                        <span class="rdv-time" style="background:var(--primary); color:white; padding:2px 8px; border-radius:4px; font-weight:bold; margin-right:10px;">${r.time}</span>
+                                        <span class="rdv-patient" style="font-weight:700;">${r.patient}</span>
+                                        ${r.isNew ? '<span class="badge badge-pending" style="margin-left:5px;">NOUVEAU</span>' : '<span class="badge badge-approved" style="margin-left:5px; background:#e0f2fe; color:#0369a1;">ANCIEN</span>'}
+                                        <div style="font-size:0.85rem; color:var(--text-secondary); margin-top:5px; margin-left:55px;">
+                                            <i class="fa-solid fa-calendar-day"></i> Date: ${r.date} ${r.isNew ? `| <i class="fa-solid fa-baby"></i> DOB: ${r.dob}` : ''}
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2" style="align-items:center;">
+                                        <button onclick="updateRDV(${r.id}, 'approved')" class="btn btn-primary btn-sm" title="Approuver"><i class="fa-solid fa-check"></i></button>
+                                        <button onclick="updateRDV(${r.id}, 'rejected')" class="btn btn-secondary btn-sm" style="color:var(--danger);" title="Refuser"><i class="fa-solid fa-xmark"></i></button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            };
+
+            root.innerHTML = `
+                <div class="view-header">
+                    <h2>Validation des Rendez-vous</h2>
+                    <p>Gérez les demandes de votre médecin attitré.</p>
+                </div>
+                <div style="max-width: 800px; margin: 0 auto;">
+                    ${renderRDVs(myDoc)}
+                </div>
+            `;
+        }
+
+
+        // --- PATIENT DIRECTORY (ENHANCED & SYNCED) ---
+        async function viewAllPatients(root) {
+            const token = localStorage.getItem('renal_token');
+            const [pr, ur] = await Promise.all([
+                fetch(API_P, { headers: { 'Authorization': `Bearer ${token}` } }),
+                fetch(API_U, { headers: { 'Authorization': `Bearer ${token}` } })
+            ]);
+            let ps = await pr.json(); const us = await ur.json();
+            const rdvs = JSON.parse(localStorage.getItem('renal_rdvs') || '[]');
+
+            // Ajouter les patients en attente de validation (non encore en base)
+            const pendingPatients = rdvs.filter(r => r.isNew && !ps.some(p => p.last_name.toLowerCase() === r.patient.split(' ')[1]?.toLowerCase()));
+
+            root.innerHTML = `
+                <div class="view-header"><h2>Annuaire Centralisé</h2><p>Registre complet (Base de données + Demandes en cours).</p></div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Identité Patient</th>
+                                <th>Médecin Traitant</th>
+                                <th>Groupe Sanguin</th>
+                                <th>Statut Dossier</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${ps.map(p => {
+                const doc = us.find(u => u.id == p.assigned_doctor_id) || { last_name: 'Non assigné' };
+                const blood = p.contact_info.includes('Sang: ') ? p.contact_info.split('Sang: ')[1].split(' |')[0] : '---';
+                return `
+                                    <tr>
+                                        <td><strong>${p.first_name} ${p.last_name}</strong><br><small>Né le ${p.date_of_birth}</small></td>
+                                        <td><span class="badge badge-approved" style="background:#f0fdf4;">Dr. ${doc.last_name.toUpperCase()}</span></td>
+                                        <td><strong style="color:var(--danger);">${blood}</strong></td>
+                                        <td><span class="badge badge-approved">Officiel</span></td>
+                                        <td><div class="flex gap-2"><button class="btn btn-secondary btn-sm"><i class="fa-solid fa-edit"></i></button></div></td>
+                                    </tr>
+                                `;
+            }).join('')}
+                            ${pendingPatients.map(r => `
+                                <tr style="background: #fffbeb;">
+                                    <td><strong>${r.patient}</strong><br><small>Né le ${r.dob}</small></td>
+                                    <td><span class="badge badge-pending">En attente (RDV)</span></td>
+                                    <td><strong style="color:var(--danger);">${r.blood}</strong></td>
+                                    <td><span class="badge badge-pending">À Valider</span></td>
+                                    <td><button onclick="navigate('assistant-rdv')" class="btn btn-primary btn-sm">Voir RDV</button></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+
+        async function updateRDV(id, status) {
+            let rdvs = JSON.parse(localStorage.getItem('renal_rdvs') || '[]');
+            const rdv = rdvs.find(r => r.id === id);
+
+            if (status === 'approved' && rdv && (rdv.isNew === true || rdv.isNew === "true")) {
+                await autoCreatePatient(rdv);
+            }
+
+            rdvs = rdvs.map(r => r.id === id ? { ...r, status } : r);
+            localStorage.setItem('renal_rdvs', JSON.stringify(rdvs));
+            notify(status === 'approved' ? "RDV Validé & Patient Créé" : "Action enregistrée", "success");
+            render();
+        }
+
+        async function autoCreatePatient(rdv) {
+            const token = localStorage.getItem('renal_token');
+            const [fname, lname] = rdv.patient.split(' ');
+            const d = {
+                first_name: fname || rdv.patient,
+                last_name: lname || '---',
+                date_of_birth: rdv.dob,
+                assigned_doctor_id: rdv.docId,
+                contact_info: `Tél: ${rdv.phone} | Sang: ${rdv.blood} | Lieu: ${rdv.pob}`
+            };
+            try {
+                await fetch(API_P, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(d)
+                });
+            } catch (e) { console.error("API Error", e); }
+        }
+
+        // --- ASSISTANT ALL RDV (MASTER SCHEDULE) ---
+        async function viewAssistantAllRDV(root) {
+            const rdvs = JSON.parse(localStorage.getItem('renal_rdvs') || '[]');
+            const [uRes] = await Promise.all([fetch(API_U)]);
+            const docs = await uRes.json();
+
+            root.innerHTML = `
+                <div class="view-header"><h2>Planning Global (2 Mois)</h2><p>Vue d'ensemble centralisée.</p></div>
+                <div class="search-bar" style="max-width:100%; margin-bottom:1.5rem;"><i class="fa-solid fa-filter"></i> <input type="text" placeholder="Filtrer..." oninput="filter(this.value, 'all-rdv-tbl')"></div>
+                <div class="table-container">
+                    <table id="all-rdv-tbl">
+                        <thead><tr><th>Date & Heure</th><th>Médecin</th><th>Patient</th><th>Statut</th><th>Actions</th></tr></thead>
+                        <tbody>
+                            ${rdvs.length === 0 ? '<tr><td colspan="5" class="text-center">Aucun RDV.</td></tr>' : rdvs.sort((a, b) => b.id - a.id).map(r => {
+                const doc = docs.find(d => d.id == r.docId) || { last_name: 'Inconnu' };
+                return `<tr>
+                                    <td><strong>${r.date} à ${r.time}</strong></td>
+                                    <td>Dr. ${doc.last_name.toUpperCase()}</td>
+                                    <td>${r.patient}</td>
+                                    <td><span class="badge badge-${r.status}">${r.status}</span></td>
+                                    <td><button onclick="deleteRDV(${r.id})" class="btn btn-secondary btn-sm" style="color:var(--danger)"><i class="fa-solid fa-trash"></i></button></td>
+                                </tr>`;
+            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <button onclick="viewPatientBooking(document.getElementById('page-content'))" class="btn btn-primary mt-4">Prendre RDV Manuel (Assistant)</button>
+            `;
+        }
+        async function viewAdmission(root) {
+            const r = await fetch(API_U); const us = await r.json(); const ds = us.filter(u => u.role === 'doctor' && u.status === 'approved');
+            root.innerHTML = `
+                <div class="view-header"><h2>Admission Manuelle</h2><p>Enregistrer un patient sans rendez-vous préalable.</p></div>
+                <div class="card" style="max-width: 500px; margin: 0 auto;">
+                    <form onsubmit="savePatient(event)">
+                        <div class="form-group"><label>Prénom</label><input type="text" id="p-f" required></div>
+                        <div class="form-group"><label>Nom</label><input type="text" id="p-l" required></div>
+                        <div class="form-group"><label>Date de Naissance</label><input type="date" id="p-d" required></div>
+                        <div class="form-group"><label>Médecin Spécialiste</label>
+                            <select id="p-doc" required>
+                                ${ds.map(d => `<option value="${d.id}">Dr. ${d.first_name} ${d.last_name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group"><label>Groupe Sanguin</label><input type="text" id="p-blood" placeholder="ex: O+"></div>
+                        <button type="submit" class="btn btn-primary w-full">ENREGISTRER LE DOSSIER</button>
+                    </form>
+                </div>
+            `;
+        }
+        async function savePatient(e) {
+            e.preventDefault();
+            const token = localStorage.getItem('renal_token');
+            const d = {
+                first_name: document.getElementById('p-f').value,
+                last_name: document.getElementById('p-l').value,
+                date_of_birth: document.getElementById('p-d').value,
+                assigned_doctor_id: document.getElementById('p-doc').value,
+                contact_info: `Tél: Manuel | Sang: ${document.getElementById('p-blood').value || '---'} | Lieu: Manuel`
+            };
+            await fetch(API_P, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(d) });
+            notify("Patient enregistré avec succès", "success"); navigate('all-patients');
+        }
+
+        // --- PATIENT DIRECTORY ENHANCED ---
+
+        // --- DOCTOR RDV ENHANCED ---
+        function viewDoctorRDV(root) {
+            const rdvs = JSON.parse(localStorage.getItem('renal_rdvs') || '[]').filter(r => r.docId === user.id && r.status === 'approved');
+            root.innerHTML = `
+                <div class="view-header"><h2>Agenda du Jour</h2><p>Gérez vos consultations. Note obligatoire pour valider.</p></div>
+                <div class="grid" style="grid-template-columns: 1fr;">
+                    ${rdvs.length === 0 ? '<p>Aucun patient prévu.</p>' : rdvs.map(r => `
+                        <div class="card mb-4" style="border-left:5px solid var(--primary);">
+                            <div class="flex justify-between items-center mb-4">
+                                <div><span class="rdv-time">${r.time}</span> - <span class="rdv-patient">${r.patient}</span></div>
+                                <div class="flex gap-2">
+                                    <button onclick="finishConsultation(${r.id})" class="btn btn-primary btn-sm">Valider Consultation</button>
+                                    <button onclick="markAbsent(${r.id})" class="btn btn-secondary btn-sm" style="color:var(--danger)">Absent (MJCH)</button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Remarques Médicales (Obligatoire pour valider)</label>
+                                <textarea id="rem-doc-${r.id}" rows="3" placeholder="Saisissez vos observations..."></textarea>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="card mt-4">
+                    <h3>Gérer mes Congés</h3>
+                    <div class="flex gap-4">
+                        <div class="form-group"><label>Début</label><input type="date" id="vac-start"></div>
+                        <div class="form-group"><label>Fin</label><input type="date" id="vac-end"></div>
+                        <button onclick="setVacation()" class="btn btn-secondary" style="height:fit-content; align-self:center;">Déclarer Congés</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function setVacation() {
+            const s = document.getElementById('vac-start').value;
+            const e = document.getElementById('vac-end').value;
+            if (!s || !e) return notify("Veuillez saisir les dates", "warning");
+            notify(`Congés déclarés du ${s} au ${e}. Les RDV seront bloqués.`, "success");
+        }
+
+        function finishConsultation(id) {
+            const notes = document.getElementById(`rem-doc-${id}`).value;
+            if (!notes || notes.length < 5) return notify("Veuillez saisir des remarques avant de valider !", "warning");
+
+            let rdvs = JSON.parse(localStorage.getItem('renal_rdvs') || '[]');
+            rdvs = rdvs.filter(r => r.id !== id);
+            localStorage.setItem('renal_rdvs', JSON.stringify(rdvs));
+            notify("Consultation validée et archivée", "success");
+            render();
+        }
+
+        function markAbsent(id) {
+            let rdvs = JSON.parse(localStorage.getItem('renal_rdvs') || '[]');
+            rdvs = rdvs.filter(r => r.id !== id);
+            localStorage.setItem('renal_rdvs', JSON.stringify(rdvs));
+            notify("Patient marqué comme absent", "danger");
+            render();
+        }
+
+        function deleteRDV(id) {
+            if (!confirm("Supprimer ce rendez-vous ?")) return;
+            let rdvs = JSON.parse(localStorage.getItem('renal_rdvs') || '[]');
+            rdvs = rdvs.filter(r => r.id !== id);
+            localStorage.setItem('renal_rdvs', JSON.stringify(rdvs));
+            notify("Rendez-vous supprimé", "danger");
+            render();
+        }
+
+
+        // --- DASHBOARD PRO ---
+        async function viewDash(root) {
+            const pRes = await fetch(API_P);
+            const patients = await pRes.json();
+
+            root.innerHTML = `
+                <div class="view-header">
+                    <h2>Bienvenue, ${user.first_name} ${user.last_name}</h2>
+                    <p style="color:var(--text-secondary);">Voici l'état de votre service aujourd'hui.</p>
+                </div>
+                <div class="grid">
+                    <div class="card"><span class="stat-label">Analyses Totales</span><span class="stat-val">128</span></div>
+                    <div class="card"><span class="stat-label">Patients Actifs</span><span class="stat-val">${patients.length}</span></div>
+                    <div class="card"><span class="stat-label">Précision IA</span><span class="stat-val">99.2%</span></div>
+                </div>
+                <div style="margin-top:2rem;">
+                    <canvas id="performanceChart" style="max-height:300px;"></canvas>
+                </div>
+            `;
+            setTimeout(initPerformanceChart, 100);
+        }
+
+        function initPerformanceChart() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Analyses Scanner',
+                        data: [12, 19, 15, 25, 22, 30],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+                }
+            });
+        }
+
+        // --- PROFILE PRO ---
+        function viewProfile(root) {
+            root.innerHTML = `
+                <div class="view-header"><h2>Votre Profil Professionnel</h2><p>Gérez vos informations et préférences.</p></div>
+                <div class="grid" style="grid-template-columns: 1fr 2fr;">
+                    <div class="card text-center">
+                        <div class="profile-img-container">
+                            <img id="profile-photo-display" src="${user.photo || 'https://via.placeholder.com/150'}" class="doctor-photo-preview" style="width:150px; height:150px;">
+                            <input type="file" onchange="updateProfilePhoto(this)">
+                            <div style="font-weight:800; color:var(--primary); margin-top:10px;">CHANGER LA PHOTO</div>
+                        </div>
+                        <h2 class="mt-4">${user.first_name} ${user.last_name.toUpperCase()}</h2>
+                        <div class="badge badge-approved">${user.role.toUpperCase()}</div>
+                        <p style="color:var(--text-secondary); margin-top:1rem;">Spécialité: ${user.specialty || 'Médecine Générale'}</p>
+                        
+                        ${user.role === 'doctor' ? `
+                            <div style="margin-top:2rem; border-top:1px solid #eee; pt-4">
+                                <button onclick="viewImpersonateNurse(document.getElementById('main-content'))" class="btn btn-secondary w-full" style="border-color:var(--primary); color:var(--primary);">
+                                    <i class="fa-solid fa-user-nurse"></i> Accès Compte Assistant
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="card">
+                        <h3 class="mb-4">Informations du Compte</h3>
+                        <div class="form-group"><label>Nom Complet</label><input type="text" id="prof-name" value="${user.first_name} ${user.last_name}" readonly style="background:#f9f9f9"></div>
+                        <div class="form-group"><label>Email Professionnel</label><input type="email" id="prof-email" value="${user.email}" readonly style="background:#f9f9f9"></div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="form-group"><label>Téléphone</label><input type="text" id="prof-phone" value="${user.phone || ''}" placeholder="05XX XX XX XX"></div>
+                            <div class="form-group"><label>Nom de la Clinique / Cabinet</label><input type="text" id="prof-clinic" value="${user.clinic_name || ''}" placeholder="Ex: Clinique El Hana"></div>
+                        </div>
+                        
+                        <div class="form-group"><label>Localisation / Adresse</label><input type="text" id="prof-loc" value="${user.location || ''}" placeholder="Ex: Alger Centre, Rue Didouche Mourad"></div>
+                        
+                        <div class="form-group"><label>Identifiant Hospitalier</label><input type="text" value="HOSP-2024-${user.id}" readonly style="background:#f9f9f9"></div>
+                        
+                        <div class="flex gap-2 mt-4">
+                            <button class="btn btn-primary w-full" onclick="saveProfile()">Enregistrer les modifications</button>
+                            <button class="btn btn-secondary w-full" style="color:var(--danger); border-color:var(--danger)" onclick="requestQuit()">Quitter le service (Supprimer le compte)</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function saveProfile() {
+            const phone = document.getElementById('prof-phone').value;
+            const clinic = document.getElementById('prof-clinic').value;
+            const loc = document.getElementById('prof-loc').value;
+
+            try {
+                const r = await fetch(`${API_U}${user.id}/`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        phone: phone,
+                        clinic_name: clinic,
+                        location: loc
+                    })
+                });
+
+                if (r.ok) {
+                    const updatedUser = await r.json();
+                    // Merge update into local user object
+                    user = { ...user, ...updatedUser };
+                    localStorage.setItem('r_user', JSON.stringify(user));
+                    notify("Profil mis à jour avec succès !", "success");
+                    render();
+                } else {
+                    notify("Erreur lors de la mise à jour", "danger");
+                }
+            } catch (err) {
+                notify("Erreur réseau", "danger");
+            }
+        }
+
+
+
+        function previewSignupPhoto(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) { document.getElementById('signup-photo-preview').src = e.target.result; };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function updateProfilePhoto(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('profile-photo-display').src = e.target.result;
+                    user.photo = e.target.result;
+                    localStorage.setItem('r_user', JSON.stringify(user));
+
+                    // Update Header Avatar instantly
+                    const avatar = document.getElementById('header-avatar');
+                    avatar.innerHTML = `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">`;
+
+                    notify("Photo de profil mise à jour", "success");
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // --- ADMIN ---
+        async function viewApprovals(root) {
+            const [ru, rr] = await Promise.all([fetch(API_U), fetch(API_U + 'list_resets/')]);
+            const us = await ru.json(); const resets = await rr.json();
+            const pend = us.filter(u => u.status === 'pending');
+
+            root.innerHTML = `
+                <div class="view-header"><h2>Approbations</h2><p>Gérez les nouveaux comptes et les oublis de mot de passe.</p></div>
+                
+                <h3 class="mb-4">Demandes d'inscription (${pend.length})</h3>
+                <div class="table-container mb-4">
+                    <table>
+                        <thead><tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Actions</th></tr></thead>
+                        <tbody>
+                            ${pend.length === 0 ? '<tr><td colspan="4" class="text-center">Aucune demande.</td></tr>' : pend.map(u => `
+                                <tr>
+                                    <td><strong>${u.first_name} ${u.last_name}</strong></td>
+                                    <td>${u.email}</td>
+                                    <td>${u.role}</td>
+                                    <td><div class="flex gap-2"><button onclick="adminOp(${u.id}, 'approve')" class="btn btn-sm btn-primary">Accepter</button><button onclick="adminOp(${u.id}, 'reject')" class="btn btn-sm btn-secondary">Refuser</button></div></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="mb-4">Demandes de Mot de passe oublié (${resets.length})</h3>
+                <div class="table-container mb-4">
+                    <table>
+                        <thead><tr><th>Nom</th><th>Email</th><th>Action</th></tr></thead>
+                        <tbody>
+                            ${resets.length === 0 ? '<tr><td colspan="3" class="text-center">Aucune demande.</td></tr>' : resets.map(r => `
+                                <tr>
+                                    <td><strong>${r.full_name}</strong></td>
+                                    <td>${r.email}</td>
+                                    <td><button onclick="adminOp(${r.id}, 'approve_reset')" class="btn btn-sm btn-primary">Valider Nouveau MDP</button></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="mb-4">Demandes de Départ (${us.filter(u => u.quit_requested).length})</h3>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Action</th></tr></thead>
+                        <tbody>
+                            ${us.filter(u => u.quit_requested).length === 0 ? '<tr><td colspan="4" class="text-center">Aucune demande.</td></tr>' : us.filter(u => u.quit_requested).map(u => `
+                                <tr>
+                                    <td><strong>${u.first_name} ${u.last_name}</strong></td>
+                                    <td>${u.email}</td>
+                                    <td>${u.role}</td>
+                                    <td><button onclick="adminOp(${u.id}, 'delete_user')" class="btn btn-sm btn-secondary" style="color:var(--danger)">Supprimer Compte</button></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        async function adminOp(id, op) { await fetch(`${API_U}${id}/${op}/`, { method: 'POST' }); notify("Opération réussie", "success"); render(); }
+
+        async function requestQuit() {
+            if (!confirm("Êtes-vous sûr de vouloir envoyer une demande de départ à votre médecin référent ?")) return;
+            await fetch(API_U + 'request_quit/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: user.id })
+            });
+            notify("Demande de départ envoyée à votre médecin référent ✓", "success");
+            render();
+        }
+
+        async function requestLeave() {
+            if (!confirm("Envoyer une demande de congé à tous vos médecins référents ?")) return;
+            await fetch(`${API_U}${user.id}/request_leave/`, { method: 'POST' });
+            notify("Demande de congé envoyée", "success");
+            // Refresh user local data
+            const r = await fetch(`${API_U}${user.id}/`);
+            user = await r.json();
+            localStorage.setItem('r_user', JSON.stringify(user));
+            render();
+        }
+
+        async function approveAssistantLeave(aid) {
+            await fetch(`${API_U}${aid}/approve_leave/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ doctor_id: user.id })
+            });
+            notify("Congé approuvé", "success");
+            render();
+        }
+
+        async function viewStaff(root) {
+            const r = await fetch(API_U); const us = await r.json();
+            root.innerHTML = `
+                <div class="view-header"><h2>Gestion Staff</h2><p>Liste complète du personnel autorisé.</p></div>
+                <div class="search-bar"><i class="fa-solid fa-search"></i><input type="text" placeholder="Filtrer..." oninput="filter(this.value, 'staff-tbl')"></div>
+                <div class="table-container"><table id="staff-tbl"><thead><tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Status</th><th>Action</th></tr></thead><tbody>
+                ${us.map(u => `<tr><td><strong>${u.first_name} ${u.last_name}</strong></td><td>${u.email}</td><td>${u.role}</td><td><span class="badge badge-${u.status}">${u.status}</span></td><td>${u.role !== 'admin' ? `<button onclick="adminOp(${u.id}, 'delete_user')" class="btn btn-sm btn-secondary" style="color:var(--danger); width:auto">Supprimer</button>` : ''}</td></tr>`).join('')}
+                </tbody></table></div>
+            `;
+        }
+
+        // --- DOCTOR ---
+        async function viewMyPatients(root) {
+            const r = await fetch(`${API_P}?doctor_id=${user.id}`); const ps = await r.json();
+            // Also show quit requests from assistants
+            // Load pending leave requests for this doctor
+            const leavesR = await fetch(`${API_U}list_leave_requests/?doctor_id=${user.id}`);
+            const leaves = await leavesR.json();
+            const pendingLeaves = leaves.filter(l => l.status === 'pending');
+
+            const leaveHTML = pendingLeaves.length > 0 ? `
+                <div class="card mb-4" style="border-left: 5px solid #f59e0b; background:#fffbeb;">
+                    <h3 style="color:#d97706;"><i class="fa-solid fa-umbrella-beach"></i> Demandes de Congé (${pendingLeaves.length})</h3>
+                    ${pendingLeaves.map(l => `
+                        <div class="flex justify-between items-center" style="padding:0.75rem 0; border-bottom:1px solid #fde68a;">
+                            <div>
+                                <strong>${l.assistant_name}</strong><br>
+                                <span style="font-size:0.85rem; color:#92400e;">Du <strong>${l.start_date}</strong> au <strong>${l.end_date}</strong></span>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="approveLeaveRequest(${l.assistant_id})" class="btn btn-sm btn-primary">Valider</button>
+                                <button onclick="rejectLeaveRequest(${l.assistant_id})" class="btn btn-sm btn-secondary" style="color:var(--danger);">Refuser</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>` : '';
+
+            const assistant = user.assistants && user.assistants.length > 0 ? user.assistants[0] : null;
+
+            const assistantHTML = assistant ? `
+                <div class="card mb-4" style="border-left: 5px solid var(--primary); display: flex; justify-content: space-between; align-items: center; background: #f0fdf4;">
+                    <div>
+                        <h3 style="margin:0; color:var(--primary);"><i class="fa-solid fa-user-nurse"></i> Mon Assistant(e) : ${assistant.first_name} ${assistant.last_name}</h3>
+                        ${assistant.quit_requested ? `<p style="margin:5px 0 0 0; color:var(--danger); font-weight:bold; font-size:0.9rem;"><i class="fa-solid fa-triangle-exclamation"></i> Souhaite quitter le service définitivement.</p>` : ''}
+                    </div>
+                    <button onclick="openAssignNurseModal(${assistant.id})" class="btn btn-secondary" style="border-color:var(--primary); color:var(--primary); width:auto;">
+                        <i class="fa-solid fa-people-arrows"></i> Remplacer
+                    </button>
+                </div>
+            ` : `
+                <div class="card mb-4" style="border-left: 5px solid #cbd5e1; background: #f8fafc; display: flex; justify-content: space-between; align-items: center;">
+                    <p style="margin:0; color:var(--text-secondary);"><i class="fa-solid fa-user-slash"></i> Aucune assistante assignée.</p>
+                    <button onclick="openAssignNurseModal(null)" class="btn btn-primary" style="width:auto;">
+                        <i class="fa-solid fa-plus"></i> Assigner une assistante
+                    </button>
+                </div>
+            `;
+
+            root.innerHTML = `
+                <div class="view-header"><h2>Mes Patients</h2><p>Dossiers sous votre responsabilité.</p></div>
+                
+                <div class="grid" style="grid-template-columns: 1fr 2fr; gap: 1.5rem; align-items: start;">
+                    <div class="assistant-sidebar">
+                        ${assistantHTML}
+                        ${leaveHTML}
+                    </div>
+                    <div class="patients-main">
+                        <div class="search-bar" style="max-width:100%"><i class="fa-solid fa-search"></i><input type="text" placeholder="Rechercher un patient..." oninput="filter(this.value, 'my-patients-tbl')"></div>
+                        <div class="table-container"><table id="my-patients-tbl"><thead><tr><th>Patient</th><th>Né(e) le</th><th>Action</th></tr></thead><tbody>
+                        ${ps.length === 0 ? '<tr><td colspan="3" class="text-center">Aucun patient assigné.</td></tr>' : ps.map(p => `<tr><td><strong>${p.first_name} ${p.last_name}</strong></td><td>${p.date_of_birth}</td><td><button onclick="openPatient(${p.id})" class="btn btn-sm btn-primary" style="width:auto">Ouvrir Dossier</button></td></tr>`).join('')}
+                        </tbody></table></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function approveLeaveRequest(assistantId) {
+            await fetch(API_U + 'approve_leave/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ assistant_id: assistantId })
+            });
+            notify('Congé validé avec succès ✓', 'success');
+            render();
+        }
+
+        async function rejectLeaveRequest(assistantId) {
+            await fetch(API_U + 'reject_leave/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ assistant_id: assistantId })
+            });
+            notify('Demande de congé refusée', 'danger');
+            render();
+        }
+
+        async function openAssignNurseModal(oldNurseId) {
+            const allR = await fetch(API_U);
+            const allUsers = await allR.json();
+            const availNurses = allUsers.filter(u => u.role === 'assistant' && u.status === 'approved' && !u.assigned_doctor);
+
+            const inner = document.getElementById('modal-inner');
+            document.getElementById('modal-container').classList.remove('hidden');
+
+            const title = oldNurseId ? "Remplacement de l'Assistant(e)" : "Assigner une Assistant(e)";
+            const text = oldNurseId
+                ? "Pour approuver le départ de votre assistant(e), vous devez obligatoirement assigner un(e) remplaçant(e) afin d'assurer la continuité du service."
+                : "Choisissez une assistante parmi celles disponibles pour commencer à collaborer.";
+
+            inner.innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h3><i class="fa-solid fa-user-plus"></i> ${title}</h3>
+                    <button onclick="closeModal()" class="btn btn-secondary btn-sm">X</button>
+                </div>
+                <p style="color:var(--text-secondary); margin-bottom:1.5rem;">${text}</p>
+                
+                ${availNurses.length === 0 ? `
+                    <div class="card" style="background:#fff5f5; border:1px solid #feb2b2; color:#c53030; padding:1rem;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Aucune infirmière n'est disponible actuellement. 
+                    </div>
+                    <button onclick="openCreateAssistantModal()" class="btn btn-primary w-full mt-4">
+                        <i class="fa-solid fa-user-plus"></i> Créer un nouveau compte assistante
+                    </button>
+                    <button onclick="closeModal()" class="btn btn-secondary w-full mt-2">Fermer</button>
+                ` : `
+                    <div class="form-group">
+                        <label>Sélectionner l'infirmière</label>
+                        <select id="new-nurse-sel" style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid #ddd;">
+                            ${availNurses.map(n => `<option value="${n.id}">${n.first_name} ${n.last_name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <button onclick="executeApprovalAndReplacement(${oldNurseId})" class="btn btn-primary w-full mt-4">
+                        ${oldNurseId ? 'Valider le Remplacement' : 'Assigner maintenant'}
+                    </button>
+                    <div style="text-align:center; margin-top:1rem; border-top:1px solid #eee; pt-4">
+                        <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.5rem;">L'assistante n'est pas dans la liste ?</p>
+                        <button onclick="openCreateAssistantModal()" class="btn btn-secondary btn-sm">
+                            <i class="fa-solid fa-plus"></i> Créer un nouveau compte
+                        </button>
+                    </div>
+                `}
+            `;
+        }
+
+        // Keep approveNurseQuit for compatibility if needed elsewhere
+        const approveNurseQuit = openAssignNurseModal;
+
+        function openCreateAssistantModal() {
+            const inner = document.getElementById('modal-inner');
+            inner.innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h3><i class="fa-solid fa-user-plus"></i> Créer un Compte Assistante</h3>
+                    <button onclick="closeModal()" class="btn btn-secondary btn-sm">X</button>
+                </div>
+                <form onsubmit="handleDoctorCreateAssistant(event)">
+                    <div class="flex gap-4">
+                        <div class="form-group" style="flex:1"><label>Prénom</label><input type="text" id="new-as-fname" required></div>
+                        <div class="form-group" style="flex:1"><label>Nom</label><input type="text" id="new-as-lname" required></div>
+                    </div>
+                    <div class="form-group"><label>Email Professionnel</label><input type="email" id="new-as-email" required></div>
+                    <div class="form-group"><label>Mot de passe provisoire</label><input type="password" id="new-as-pass" required></div>
+                    <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:1rem; background:#f0f9ff; padding:10px; border-radius:8px; border:1px solid #bae6fd;">
+                        <i class="fa-solid fa-info-circle"></i> L'assistante sera automatiquement liée à votre service après validation par l'administrateur.
+                    </p>
+                    <button type="submit" class="btn btn-primary w-full">CRÉER LE COMPTE</button>
+                    <button type="button" onclick="openAssignNurseModal(null)" class="btn btn-secondary w-full mt-2">Retour à la sélection</button>
+                </form>
+            `;
+        }
+
+        async function handleDoctorCreateAssistant(e) {
+            e.preventDefault();
+            const data = {
+                username: document.getElementById('new-as-email').value.split('@')[0] + Math.floor(Math.random() * 100),
+                email: document.getElementById('new-as-email').value,
+                password: document.getElementById('new-as-pass').value,
+                first_name: document.getElementById('new-as-fname').value,
+                last_name: document.getElementById('new-as-lname').value,
+                role: 'assistant',
+                assigned_doctor: user.id
+            };
+
+            try {
+                const r = await fetch(API_U + 'signup/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (r.ok) {
+                    notify("Compte assistante créé avec succès ! En attente de validation admin.", "success");
+                    closeModal();
+                } else {
+                    const res = await r.json();
+                    notify(res.error || "Erreur lors de la création", "danger");
+                }
+            } catch (err) {
+                notify("Erreur réseau", "danger");
+            }
+        }
+
+
+        async function executeApprovalAndReplacement(oldNurseId) {
+            const newNurseId = document.getElementById('new-nurse-sel').value;
+            if (!newNurseId) return notify("Veuillez choisir un remplaçant", "warning");
+
+            try {
+                const r = await fetch(API_U + 'replace_assistant/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        old_id: oldNurseId,
+                        new_id: newNurseId,
+                        doctor_id: user.id
+                    })
+                });
+
+                if (r.ok) {
+                    closeModal();
+                    notify("Remplacement effectué avec succès ! L'ancien assistant est libéré.", "success");
+                    // Refresh data
+                    const userR = await fetch(`${API_U}${user.id}/`);
+                    user = await userR.json();
+                    localStorage.setItem('r_user', JSON.stringify(user));
+                    render();
+                } else {
+                    notify("Erreur lors du remplacement", "danger");
+                }
+            } catch (err) {
+                notify("Erreur réseau", "danger");
+            }
+        }
+
+        async function rejectNurseQuit(nurseId) {
+            if (!confirm("Refuser la demande de départ ? L'infirmière restera en poste.")) return;
+            try {
+                const r = await fetch(`${API_U}${nurseId}/reject_quit/`, { method: 'POST' });
+                if (r.ok) {
+                    notify("Demande de départ refusée. L'infirmière reste en poste.", "success");
+                    // Refresh data
+                    const userR = await fetch(`${API_U}${user.id}/`);
+                    user = await userR.json();
+                    localStorage.setItem('r_user', JSON.stringify(user));
+                    render();
+                }
+            } catch (err) {
+                notify("Erreur réseau", "danger");
+            }
+        }
+
+
+        // Nurse views ONLY their doctor's patients + congé request
+        async function viewDoctorPatientsForNurse(root) {
+            const myDoctor = user.doctor;
+            if (!myDoctor) {
+                root.innerHTML = `<div class="view-header"><h2>Patients du Médecin</h2></div><div class="card"><p>Vous n'êtes assigné(e) à aucun médecin pour le moment.</p></div>`;
+                return;
+            }
+            const r = await fetch(`${API_P}?doctor_id=${myDoctor.id}`);
+            const ps = await r.json();
+            // Check if there's already a pending leave
+            const leavesR = await fetch(`${API_U}list_leave_requests/?doctor_id=${myDoctor.id}`);
+            const leaves = await leavesR.json();
+            const myLeave = leaves.find(l => l.assistant_id === user.id);
+            const today = new Date().toISOString().split('T')[0];
+            root.innerHTML = `
+                <div class="view-header">
+                    <h2>Patients de Dr. ${myDoctor.last_name}</h2>
+                    <p>Vous consultez uniquement les patients de votre médecin référent.</p>
+                </div>
+                <div class="search-bar"><i class="fa-solid fa-search"></i><input type="text" placeholder="Rechercher..." oninput="filter(this.value, 'nurse-doc-tbl')"></div>
+                <div class="table-container"><table id="nurse-doc-tbl"><thead><tr><th>Patient</th><th>Né(e) le</th><th>Dernière Visite</th><th>Action</th></tr></thead><tbody>
+                ${ps.length === 0 ? '<tr><td colspan="4" class="text-center">Aucun patient pour ce médecin.</td></tr>' : ps.map(p => `<tr><td><strong>${p.first_name} ${p.last_name}</strong></td><td>${p.date_of_birth}</td><td>${new Date(p.updated_at).toLocaleDateString()}</td><td><button onclick="openPatient(${p.id})" class="btn btn-sm btn-primary" style="width:auto">Voir Dossier</button></td></tr>`).join('')}
+                </tbody></table></div>
+
+                <!-- CONGÉ SECTION - bouton popup -->
+                <div class="mt-4 flex justify-between items-center" style="flex-wrap:wrap; gap:1rem;">
+                    ${myLeave ? `
+                        <div style="background:#fef3c7; border:1px solid #fde68a; border-radius:10px; padding:0.75rem 1.25rem; flex:1; min-width:250px;">
+                            <span style="font-weight:700; color:#92400e;"><i class="fa-solid fa-hourglass-half"></i> Congé en attente :</span>
+                            Du <strong>${myLeave.start_date}</strong> au <strong>${myLeave.end_date}</strong>
+                            <span style="font-size:0.8rem; color:#b45309;"> - En attente de validation</span>
+                        </div>
+                    ` : `
+                        <div></div>
+                    `}
+                    <button onclick="openNurseCongeWindow(${user.id})" class="btn btn-secondary" style="border-color:#f59e0b; color:#d97706; flex-shrink:0;">
+                        <i class="fa-solid fa-umbrella-beach"></i> Demander un Congé
+                    </button>
+                </div>
+
+                <!-- QUITTER LE SERVICE -->
+                <div class="card mt-4" style="border-left:4px solid var(--danger);">
+                    <h3 style="color:var(--danger); margin-bottom:0.5rem;"><i class="fa-solid fa-door-open"></i> Quitter le Service (Définitif)</h3>
+                    <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1rem;">Cette action est irréversible. L'historique des patients sera conservé et transmis au remplaçant(e).</p>
+                    <button onclick="requestQuit()" class="btn btn-secondary" style="color:var(--danger); border-color:var(--danger);"><i class="fa-solid fa-right-from-bracket"></i> Demander à quitter définitivement</button>
+                </div>
+            `;
+        }
+
+        function openNurseCongeWindow(assistantId) {
+            const inner = document.getElementById('modal-inner');
+            document.getElementById('modal-container').classList.remove('hidden');
+            inner.innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h3><i class="fa-solid fa-umbrella-beach"></i> Demander un Congé</h3>
+                    <button onclick="closeModal()" class="btn btn-secondary btn-sm">X</button>
+                </div>
+                <div style="padding: 1rem;">
+                    <p style="color:var(--text-secondary); margin-bottom:1.5rem;">Sélectionnez vos dates de début et de fin de congé. Votre médecin devra valider la demande.</p>
+                    <div class="form-group">
+                        <label>Date de Début</label>
+                        <input type="date" id="leave-start" style="width:100%; padding:0.8rem; border-radius:8px; border:1px solid var(--border);">
+                    </div>
+                    <div class="form-group" style="margin-top:1rem;">
+                        <label>Date de Fin (Inclus)</label>
+                        <input type="date" id="leave-end" style="width:100%; padding:0.8rem; border-radius:8px; border:1px solid var(--border);">
+                    </div>
+                    <div style="margin-top:2rem; background: #fff8eb; border: 1px solid #fde68a; padding: 1rem; border-radius: 8px; font-size:0.85rem; color:#92400e;">
+                        <i class="fa-solid fa-circle-info"></i> Note: Une fois envoyée, vous ne pourrez pas modifier la demande tant qu'elle n'est pas traitée.
+                    </div>
+                    <button onclick="submitLeaveRequest()" class="btn btn-primary w-full mt-4" style="padding:1rem;">
+                        <i class="fa-solid fa-paper-plane"></i> ENVOYER LA DEMANDE
+                    </button>
+                </div>
+            `;
+        }
+
+        async function submitLeaveRequest() {
+            const start = document.getElementById('leave-start').value;
+            const end = document.getElementById('leave-end').value;
+            if (!start || !end) return notify('Veuillez sélectionner les deux dates', 'danger');
+            if (end <= start) return notify('La date de retour doit être après la date de début', 'danger');
+            await fetch(API_U + 'request_leave/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: user.id, start_date: start, end_date: end })
+            });
+            notify(`Demande de congé envoyée ✓ (Du ${start} au ${end})`, 'success');
+            closeModal();
+            navigate('my-doctor-patients');
+        }
+
+        // Doctor impersonates nurse account - opens in a NEW WINDOW
+        async function viewImpersonateNurse(root) {
+            if (!user.assistants || user.assistants.length === 0) {
+                root.innerHTML = `<div class="view-header"><h2>Accès Infirmière</h2></div><div class="card"><p>Aucune infirmière assignée à votre service.</p></div>`;
+                return;
+            }
+            const nurse = user.assistants[0];
+            const r = await fetch(`${API_U}${nurse.id}/impersonate/`, { method: 'POST' });
+            const d = await r.json();
+            const nurseUser = d.user;
+
+            // Store the nurse session in sessionStorage so the new window can read it
+            sessionStorage.setItem('impersonate_user', JSON.stringify(nurseUser));
+
+            // Open new window
+            const newWin = window.open(window.location.href, '_blank', 'width=1280,height=800,menubar=no,toolbar=no,location=no');
+
+            root.innerHTML = `
+                <div class="view-header" style="border-left: 5px solid #f59e0b; padding-left:1rem;">
+                    <h2><i class="fa-solid fa-external-link-alt"></i> Fenêtre Infirmière Ouverte</h2>
+                    <p>Le compte de <strong>${nurseUser.first_name} ${nurseUser.last_name}</strong> a été ouvert dans une nouvelle fenêtre.</p>
+                </div>
+                <div class="card" style="border-left: 4px solid #f59e0b; max-width:400px; margin:2rem auto; text-align:center;">
+                    <i class="fa-solid fa-window-restore fa-3x mb-4" style="color:#f59e0b;"></i>
+                    <h3>${nurseUser.first_name} ${nurseUser.last_name}</h3>
+                    <p style="color:var(--text-secondary); margin:0.5rem 0;">${nurseUser.email}</p>
+                    <p style="margin-top:1rem;">Vous pouvez travailler sur les deux comptes simultanément.</p>
+                    <button onclick="sessionStorage.setItem('impersonate_user', JSON.stringify(${JSON.stringify(nurseUser)})); window.open(window.location.href, '_blank', 'width=1280,height=800,menubar=no,toolbar=no')" class="btn btn-primary mt-4">Réouvrir la fenêtre</button>
+                </div>
+            `;
+        }
+
+        async function openPatient(id) {
+            const [pr, cr] = await Promise.all([fetch(`${API_P}${id}/`), fetch(`${API_C}?patient_id=${id}`)]);
+            const p = await pr.json(); const cs = await cr.json();
+            const modal = document.getElementById('modal-container'); const inner = document.getElementById('modal-inner');
+            modal.classList.remove('hidden');
+            inner.innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h3>Dossier Médical : ${p.first_name} ${p.last_name}</h3>
+                    <button onclick="closeModal()" class="btn btn-secondary btn-sm">Fermer</button>
+                </div>
+                <div style="max-height: 400px; overflow-y: auto;">
+                    <h4>Historique des consultations</h4>
+                    ${cs.length === 0 ? '<p>Aucun examen enregistré.</p>' : cs.map(c => `
+                        <div class="card mb-4" style="padding:1rem;">
+                            <div class="flex justify-between"><strong>${new Date(c.date).toLocaleDateString()}</strong> <span style="color:var(--primary)">IA Result: ${c.ai_result}</span></div>
+                            <p style="font-size:0.9rem; margin-top:8px;">${c.medical_notes}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        async function viewNewScan(root) {
+            const r = await fetch(`${API_P}?doctor_id=${user.id}`);
+            const patients = await r.json();
+
+            root.innerHTML = `
+                <div class="view-header"><h2>Analyse Scanner PyTorch</h2><p>Analyse automatique de calculs rénaux.</p></div>
+                <div class="scanner-hero">
+                    <input type="file" id="scan-file-input" class="hidden" onchange="handleFileSelect(this)">
+                    <div class="upload-zone" onclick="document.getElementById('scan-file-input').click()">
+                        <i class="fa-solid fa-file-medical fa-3x" style="color:var(--primary)"></i>
+                        <h3 id="upload-status">Cliquez pour télécharger un scan</h3>
+                        <p id="file-name">DICOM, PNG, JPG (Max 50MB)</p>
+                    </div>
+                    <div style="max-width: 500px; margin: 0 auto; text-align: left;">
+                        <div class="form-group">
+                            <label>Sélectionner le Patient</label>
+                            <select id="scan-patient-id" required>
+                                <option value="">-- Choisir un patient --</option>
+                                ${patients.map(p => `<option value="${p.id}">${p.first_name} ${p.last_name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Date de Consultation</label>
+                            <input type="date" id="scan-date" value="${new Date().toISOString().split('T')[0]}">
+                        </div>
+                        <div class="form-group"><label>Observations Pré-scan</label><textarea id="scan-obs" rows="3"></textarea></div>
+                        <button onclick="runAI()" id="btn-run-ai" class="btn btn-primary"><i class="fa-solid fa-brain"></i> Lancer la Segmentation</button>
+                    </div>
+                </div>
+                <div id="ai-result-section" class="hidden card" style="max-width: 600px; margin: 2rem auto; border: 2px solid var(--primary);">
+                    <!-- Result will be injected here -->
+                </div>
+            `;
+        }
+
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                const name = input.files[0].name;
+                document.getElementById('upload-status').textContent = "Fichier prêt !";
+                document.getElementById('file-name').innerHTML = `<span style="color:var(--primary); font-weight:700">${name}</span>`;
+                notify(`Fichier "${name}" sélectionné`, "success");
+            }
+        }
+
+        async function runAI() {
+            const fileInput = document.getElementById('scan-file-input');
+            const file = fileInput.files[0];
+            const pid = document.getElementById('scan-patient-id').value;
+
+            if (!pid) { notify("Veuillez sélectionner un patient", "danger"); return; }
+            if (!file) { notify("Veuillez d'abord sélectionner un fichier scanner", "danger"); return; }
+
+            const btn = document.getElementById('btn-run-ai');
+            btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Traitement...';
+            notify("Traitement IA en cours...", "primary");
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                // Call real AI service
+                const response = await fetch(API_I, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error("Erreur serveur IA");
+                const data = await response.json();
+                console.log("AI Data received:", data); // Helpful for debugging
+
+                const diagnosis = data.diagnosis || 'Unknown';
+                const confidence = data.confidence_pct ? data.confidence_pct.toFixed(1) + "%" : "0%";
+                const probs = data.all_probabilities || {};
+                const severity = data.severity || 'N/A';
+                const coverage = data.stone_coverage_pct || 0;
+
+                const imageUrl = URL.createObjectURL(file);
+                // Use real segmentation mask if available, otherwise original image
+                const maskUrl = data.mask_image_url ? `http://localhost:8003${data.mask_image_url}` : null;
+                const isSick = diagnosis !== 'Normal';
+
+                let barsHTML = '';
+                for (const [cls, pct] of Object.entries(probs)) {
+                    let color = '#10b981'; // green for normal
+                    if (cls !== 'Normal' && pct > 20) color = '#ef4444'; // red for disease
+                    barsHTML += `
+                        <div style="margin-bottom: 0.5rem;">
+                            <div style="display:flex; justify-content:space-between; font-size: 0.85rem; font-weight:700;">
+                                <span>${cls}</span><span>${pct.toFixed(1)}%</span>
+                            </div>
+                            <div style="width:100%; background:#e2e8f0; border-radius:4px; height:8px; overflow:hidden;">
+                                <div style="width:${pct}%; background:${color}; height:100%;"></div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                const resSection = document.getElementById('ai-result-section');
+                resSection.classList.remove('hidden');
+                resSection.innerHTML = `
+                    <div style="text-align:center; padding: 2rem;">
+                        <h3 style="color:var(--primary); margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); padding-bottom:10px;">RAPPORT D'ANALYSE IA</h3>
+                        
+                        <!-- Segmentation Result Image -->
+                        <div style="position:relative; display:inline-block; max-width: 100%; border: 4px solid var(--primary); border-radius: 8px; overflow:hidden; margin-bottom: 1.5rem; background: #000;">
+                            ${isSick && maskUrl ? '<div style="position:absolute; top:10px; right:10px; background:#ef4444; color:#fff; padding:5px 10px; font-weight:bold; font-size:0.8rem; border-radius:4px; z-index:10;"><i class="fa-solid fa-microscope"></i> Segmentation IA</div>' : ''}
+                            <img src="${maskUrl || imageUrl}" style="display:block; max-width: 100%; max-height: 400px;">
+                        </div>
+                        
+                        <div style="font-size: 1.6rem; font-weight:800; margin: 0.5rem 0; color: var(--text-main);">
+                            ${!isSick ? '<i class="fa-solid fa-check-circle" style="color:var(--success)"></i> Normal' : `<i class="fa-solid fa-triangle-exclamation" style="color:var(--danger)"></i> ${diagnosis} Détecté`} 
+                            (${confidence})
+                        </div>
+                        
+                        ${isSick ? `
+                        <div style="display:flex; gap: 10px; justify-content:center; margin-bottom: 1.5rem;">
+                            <span style="background: #fee2e2; color: #ef4444; padding: 5px 15px; border-radius: 20px; font-weight:700; font-size: 0.9rem;">Sévérité : ${severity}</span>
+                            <span style="background: #fef3c7; color: #d97706; padding: 5px 15px; border-radius: 20px; font-weight:700; font-size: 0.9rem;">Couverture : ${(coverage || 0).toFixed(4)}%</span>
+                        </div>` : ''}
+
+                        <div style="text-align:left; background: #f8fafc; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid #e2e8f0;">
+                            <h4 style="margin-bottom: 1rem; color:var(--text-secondary);">Probabilités par Classe</h4>
+                            ${barsHTML}
+                        </div>
+                        
+                        <div class="form-group" style="text-align:left">
+                            <label>Notes Médicales Finales & Remarques</label>
+                            <textarea id="final-notes" rows="4">${document.getElementById('scan-obs').value}\n\n[IA Info] Diagnostic: ${diagnosis} (${confidence}) | Sévérité: ${severity}</textarea>
+                        </div>
+                        <button onclick="saveConsultation('${diagnosis} (${confidence})')" class="btn btn-primary w-full"><i class="fa-solid fa-save"></i> Enregistrer dans le Dossier Patient</button>
+                    </div>
+                `;
+                notify("Analyse IA et segmentation terminées", "success");
+                resSection.scrollIntoView({ behavior: 'smooth' });
+
+            } catch (err) {
+                console.error(err);
+                notify("Erreur lors de l'analyse : " + err.message, "danger");
+            } finally {
+                btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-brain"></i> Lancer la Segmentation';
+            }
+        }
+
+        async function saveConsultation(aiResult) {
+            const data = {
+                patient: document.getElementById('scan-patient-id').value,
+                doctor_id: user.id,
+                date: document.getElementById('scan-date').value,
+                scanner_image_url: "scan_default.jpg",
+                ai_result: aiResult,
+                medical_notes: document.getElementById('final-notes').value
+            };
+
+            try {
+                const r = await fetch(API_C, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (r.ok) {
+                    notify("Consultation enregistrée avec succès !", "success");
+                    navigate('my-patients');
+                } else {
+                    notify("Erreur lors de l'enregistrement", "danger");
+                }
+            } catch (e) { notify("Erreur réseau", "danger"); }
+        }
+
+        function filter(q, tid) {
+            const rows = document.querySelectorAll(`#${tid} tbody tr`);
+            const query = q.toLowerCase();
+            rows.forEach(r => r.style.display = r.textContent.toLowerCase().includes(query) ? '' : 'none');
+        }
+
+        function closeModal() { document.getElementById('modal-container').classList.add('hidden'); }
+
+        const translations = {
+            fr: {
+                subtitle: "Intelligence Artificielle & Gestion Médicale",
+                email: "Adresse Email",
+                password: "Mot de passe",
+                login: "Se Connecter",
+                patient_access: "ACCÈS PATIENT (Sans Compte)",
+                forgot_pass: "Mot de passe oublié ?",
+                new_here: "Nouveau ?",
+                create_account: "Créer un compte",
+                logout: "Déconnexion",
+                dashboard: "Tableau de Bord",
+                my_patients: "Mes Patients",
+                ai_analysis: "Analyse IA",
+                appointments: "Agenda RDV",
+                admissions: "Admissions",
+                validate_rdv: "Valider RDV",
+                global_planning: "Planning Global",
+                doc_patients: "Patients Dr.",
+                profile: "Mon Profil",
+                approvals: "Vérifications",
+                staff_mgmt: "Gestion Staff"
+            },
+            en: {
+                subtitle: "Artificial Intelligence & Medical Management",
+                email: "Email Address",
+                password: "Password",
+                login: "Login",
+                patient_access: "PATIENT ACCESS (No Account)",
+                forgot_pass: "Forgot Password?",
+                new_here: "New here?",
+                create_account: "Create Account",
+                logout: "Logout",
+                dashboard: "Dashboard",
+                my_patients: "My Patients",
+                ai_analysis: "AI Analysis",
+                appointments: "Appointments",
+                admissions: "Admissions",
+                validate_rdv: "Validate Appts",
+                global_planning: "Global Planning",
+                doc_patients: "Doctor's Patients",
+                profile: "My Profile",
+                approvals: "Approvals",
+                staff_mgmt: "Staff Mgmt"
+            }
+        };
+
+        let currentLang = localStorage.getItem('lang') || 'fr';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('lang', lang);
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('onclick').includes(`'${lang}'`));
+            });
+            const emailInput = document.getElementById('in-email');
+            if (emailInput) emailInput.placeholder = lang === 'fr' ? 'nom@hopital.com' : 'name@hospital.com';
+
+            if (user) {
+                buildNav();
+            }
+        }
+
+        window.onload = () => {
+            setLanguage(currentLang);
+            // Check if this window was opened for nurse impersonation
+            const impersonateData = sessionStorage.getItem('impersonate_user');
+            if (impersonateData) {
+                sessionStorage.removeItem('impersonate_user');
+                user = JSON.parse(impersonateData);
+                // Show a banner indicating impersonation mode
+                document.title = `RenalAI - Compte: ${user.first_name} ${user.last_name}`;
+                start();
+                // Add a visible banner
+                setTimeout(() => {
+                    const header = document.querySelector('header');
+                    if (header) {
+                        const banner = document.createElement('div');
+                        banner.style.cssText = 'background:#f59e0b; color:#fff; text-align:center; padding:6px; font-weight:700; font-size:0.85rem;';
+                        banner.innerHTML = `⚠️ Vous consultez le compte de : ${user.first_name} ${user.last_name} (${user.email}) &mdash; <span style="opacity:0.8">Fermèz cette fenêtre pour revenir à votre session</span>`;
+                        header.before(banner);
+                    }
+                }, 300);
+                return;
+            }
+            const s = localStorage.getItem('r_user');
+            if (s) { user = JSON.parse(s); start(); }
+        };
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,32 @@
+# ==========================================
+# 1. Environment & Large Folders (The 6k culprits)
+# ==========================================
+node_modules/
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+
+# ==========================================
+# 2. Docker & Databases
+# ==========================================
+.docker_data/
+postgres_data/
+*.log
+
+# ==========================================
+# 3. Model & Large Data
+# ==========================================
+# We usually don't push the heavy .pth files or the raw datasets
+*.pth
+*.h5
+datasets/
+results/*
+!results/.gitkeep
+
+# ==========================================
+# 4. OS Specific
+# ==========================================
+.DS_Store
+Thumbs.db
