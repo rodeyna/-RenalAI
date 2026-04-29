@@ -13,7 +13,7 @@ IDX_TO_CLASS = {0: 'Cyst', 1: 'Normal', 2: 'Stone', 3: 'Tumor'}
 
 BASE_DIR = Path(__file__).parent
 
-# ── Classifier Architecture ──
+# ── Classifier Arc hitecture ──
 class ActualClassifier(nn.Module):
     def __init__(self, num_classes=4):
         super().__init__()
